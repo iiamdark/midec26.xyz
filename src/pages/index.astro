@@ -1,0 +1,123 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource/jetbrains-mono/400.css';
+import '../styles/global.css';
+
+const artist = 'MIDEC';
+const releases = [
+  { t: 'Nocturno', y: '2026', k: 'Álbum', c: 'forest' },
+  { t: 'Vacío', y: '2025', k: 'EP', c: 'sand' },
+  { t: 'Señal', y: '2025', k: 'Sencillo', c: 'iris' },
+  { t: 'Marea', y: '2024', k: 'Sencillo', c: 'slate' },
+];
+const shows = [
+  { d: '14 NOV 2026', c: 'Ciudad de México', v: 'Foro Indie Rocks' },
+  { d: '28 NOV 2026', c: 'Bogotá', v: 'Teatro Royal Center' },
+  { d: '12 DIC 2026', c: 'Buenos Aires', v: 'Niceto Club' },
+  { d: '20 ENE 2027', c: 'Madrid', v: 'Sala But' },
+];
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{artist} — Sitio oficial</title>
+    <meta name="description" content="Música, fechas de gira y novedades de MIDEC." />
+    <link rel="icon" href="/favicon.svg" />
+  </head>
+  <body>
+    <nav class="top">
+      <div class="wrap">
+        <a href="#top">{artist}</a>
+        <ul>
+          <li><a href="#musica">Música</a></li>
+          <li><a href="#gira">Gira</a></li>
+          <li><a href="#sobre">Sobre</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <header class="hero" id="top">
+      <div class="wrap">
+        <span class="mono">Nuevo álbum · Nocturno</span>
+        <h1 class="display" style="margin-top:16px">{artist}</h1>
+        <p class="lead">Sonido nocturno, texturas electrónicas y letras al borde del silencio.</p>
+        <a class="btn light" href="#musica">Escuchar ahora</a>
+        <div class="scroll mono"><i>↓</i> Scroll para explorar</div>
+      </div>
+    </header>
+
+    <section id="musica">
+      <div class="wrap">
+        <div class="head">
+          <div><span class="eyebrow mono">Discografía</span><h2 class="h-lg">Música</h2></div>
+          <a class="btn ghost" href="#">Todas las plataformas</a>
+        </div>
+        <div class="grid">
+          {releases.map((r) => (
+            <a class={`card ${r.c}`} href="#">
+              <span class="mono">{r.k} · {r.y}</span>
+              <h3>{r.t}</h3>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="gira" style="padding-top:0">
+      <div class="wrap">
+        <div class="head"><div><span class="eyebrow mono">En vivo</span><h2 class="h-lg">Gira</h2></div></div>
+        <ul class="tour">
+          {shows.map((s) => (
+            <li>
+              <span class="mono">{s.d}</span>
+              <div><b>{s.c}</b><br /><span>{s.v}</span></div>
+              <a class="btn" href="#">Entradas</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="void" id="sobre">
+      <div class="wrap cols">
+        <div>
+          <span class="eyebrow mono" style="color:var(--smoke)">Sobre</span>
+          <h2 class="h-lg">Música para las horas que nadie reclama.</h2>
+          <p class="lead" style="margin-top:24px">MIDEC construye paisajes sonoros entre lo electrónico y lo íntimo. Cada disco es una noche distinta: grabada, editada y habitada en solitario.</p>
+        </div>
+        <svg viewBox="0 0 400 400" fill="none" stroke="#fff" stroke-opacity=".5" aria-hidden="true">
+          <circle cx="200" cy="200" r="190"/><circle cx="200" cy="200" r="140"/><circle cx="200" cy="200" r="90"/><circle cx="200" cy="200" r="40"/>
+          <path d="M10 200H390M200 10V390"/>
+        </svg>
+      </div>
+    </section>
+
+    <section id="contacto">
+      <div class="wrap">
+        <div class="panel">
+          <span class="mono" style="opacity:.7">Newsletter</span>
+          <h2 class="h-lg" style="margin-top:16px;max-width:720px">Sé el primero en escuchar lo nuevo.</h2>
+          <form onsubmit="event.preventDefault();this.querySelector('button').textContent='Listo ✓'">
+            <input type="email" required placeholder="tu@correo.com" aria-label="Correo electrónico" />
+            <button class="btn light" type="submit">Suscribirme</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <div class="cols">
+          <h2 class="h">{artist}</h2>
+          <div><span class="mono">Escuchar</span><ul><li><a href="#">Spotify</a></li><li><a href="#">Apple Music</a></li><li><a href="#">Bandcamp</a></li></ul></div>
+          <div><span class="mono">Social</span><ul><li><a href="#">Instagram</a></li><li><a href="#">YouTube</a></li><li><a href="#">TikTok</a></li></ul></div>
+          <div><span class="mono">Contacto</span><ul><li><a href="mailto:booking@midec26.xyz">booking@midec26.xyz</a></li></ul></div>
+        </div>
+        <small class="mono">© 2026 {artist}</small>
+      </div>
+    </footer>
+  </body>
+</html>

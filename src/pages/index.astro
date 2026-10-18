@@ -5,17 +5,19 @@ import '../styles/global.css';
 
 const artist = 'MIDEC';
 const releases = [
-  { t: 'Nocturno', y: '2026', k: 'Álbum', c: 'forest' },
-  { t: 'Vacío', y: '2025', k: 'EP', c: 'sand' },
-  { t: 'Señal', y: '2025', k: 'Sencillo', c: 'iris' },
-  { t: 'Marea', y: '2024', k: 'Sencillo', c: 'slate' },
+  { t: 'Nocturno', y: '2026', k: 'Álbum', c: 'forest', seed: 1 },
+  { t: 'Vacío', y: '2025', k: 'EP', c: 'sand', seed: 2 },
+  { t: 'Señal', y: '2025', k: 'Sencillo', c: 'iris', seed: 3 },
+  { t: 'Marea', y: '2024', k: 'Sencillo', c: 'slate', seed: 4 },
 ];
 const shows = [
-  { d: '14 NOV 2026', c: 'Ciudad de México', v: 'Foro Indie Rocks' },
+  { d: '14 NOV 2026', c: 'Ciudad de México', v: 'Foro Indie Rocks', s: 'Últimas' },
   { d: '28 NOV 2026', c: 'Bogotá', v: 'Teatro Royal Center' },
-  { d: '12 DIC 2026', c: 'Buenos Aires', v: 'Niceto Club' },
+  { d: '12 DIC 2026', c: 'Buenos Aires', v: 'Niceto Club', s: 'Agotado' },
   { d: '20 ENE 2027', c: 'Madrid', v: 'Sala But' },
+  { d: '03 FEB 2027', c: 'Barcelona', v: 'Razzmatazz 2' },
 ];
+const quote = 'Música para las horas que nadie reclama. Grabada, editada y habitada en solitario.';
 ---
 <!doctype html>
 <html lang="es">
@@ -27,9 +29,15 @@ const shows = [
     <link rel="icon" href="/favicon.svg" />
   </head>
   <body>
+    <div class="loader" aria-hidden="true">
+      <span class="mono">{artist} — Cargando</span>
+      <span class="count">0</span>
+    </div>
+    <div class="cursor" aria-hidden="true"></div>
+
     <nav class="top">
       <div class="wrap">
-        <a href="#top">{artist}</a>
+        <a href="#top" class="logo">{artist}</a>
         <ul>
           <li><a href="#musica">Música</a></li>
           <li><a href="#gira">Gira</a></li>
@@ -40,69 +48,88 @@ const shows = [
     </nav>
 
     <header class="hero" id="top">
-      <div class="wrap">
-        <span class="mono">Nuevo álbum · Nocturno</span>
-        <h1 class="display" style="margin-top:16px">{artist}</h1>
-        <p class="lead">Sonido nocturno, texturas electrónicas y letras al borde del silencio.</p>
-        <a class="btn light" href="#musica">Escuchar ahora</a>
-        <div class="scroll mono"><i>↓</i> Scroll para explorar</div>
+      <canvas id="hero-gl"></canvas>
+      <div class="content">
+        <span class="mono hero-in">Nuevo álbum · Nocturno · 2026</span>
+        <h1 class="display split" style="margin-top:24px">{artist}</h1>
+        <p class="lead hero-in">Sonido nocturno, texturas electrónicas y letras al borde del silencio.</p>
+        <div class="hero-in"><a class="btn light magnetic" href="#musica">Escuchar ahora <span class="arr">→</span></a></div>
+      </div>
+      <div class="meta wrap mono hero-in">
+        <div class="scroll"><i><b>↓</b></i> Scroll para explorar</div>
+        <span>CDMX — 19.43° N</span>
       </div>
     </header>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="track">
+        {[0, 1].map(() => ['Nocturno', 'Tour 2026', 'Nuevo álbum', 'En vivo', 'MIDEC'].map((w) => <span>{w}</span>))}
+      </div>
+    </div>
 
     <section id="musica">
       <div class="wrap">
         <div class="head">
-          <div><span class="eyebrow mono">Discografía</span><h2 class="h-lg">Música</h2></div>
-          <a class="btn ghost" href="#">Todas las plataformas</a>
+          <div><span class="eyebrow mono reveal">Discografía</span><h2 class="h-lg split">Música</h2></div>
+          <a class="btn ghost reveal" href="#">Todas las plataformas <span class="arr">→</span></a>
         </div>
         <div class="grid">
           {releases.map((r) => (
-            <a class={`card ${r.c}`} href="#">
-              <span class="mono">{r.k} · {r.y}</span>
-              <h3>{r.t}</h3>
+            <a class={`card tilt ${r.c}`} href="#">
+              <canvas class="art" data-seed={r.seed}></canvas>
+              <span class="mono"><span>{r.k}</span><span>{r.y}</span></span>
+              <div>
+                <h3>{r.t}</h3>
+                <div class="play" style="margin-top:16px">▶</div>
+              </div>
             </a>
           ))}
         </div>
-      </div>
-    </section>
-
-    <section id="gira" style="padding-top:0">
-      <div class="wrap">
-        <div class="head"><div><span class="eyebrow mono">En vivo</span><h2 class="h-lg">Gira</h2></div></div>
-        <ul class="tour">
-          {shows.map((s) => (
-            <li>
-              <span class="mono">{s.d}</span>
-              <div><b>{s.c}</b><br /><span>{s.v}</span></div>
-              <a class="btn" href="#">Entradas</a>
-            </li>
-          ))}
-        </ul>
+        <div class="stats">
+          <div class="stat reveal"><b data-count="48">0</b><span>Millones de reproducciones</span></div>
+          <div class="stat reveal"><b data-count="120">0</b><span>Shows en 14 países</span></div>
+          <div class="stat reveal"><b data-count="4">0</b><span>Discos publicados</span></div>
+        </div>
       </div>
     </section>
 
     <section class="void" id="sobre">
       <div class="wrap cols">
         <div>
-          <span class="eyebrow mono" style="color:var(--smoke)">Sobre</span>
-          <h2 class="h-lg">Música para las horas que nadie reclama.</h2>
-          <p class="lead" style="margin-top:24px">MIDEC construye paisajes sonoros entre lo electrónico y lo íntimo. Cada disco es una noche distinta: grabada, editada y habitada en solitario.</p>
+          <span class="eyebrow mono reveal" style="color:var(--smoke)">Sobre</span>
+          <p class="big-quote">{quote.split(' ').map((w) => <span class="w">{w} </span>)}</p>
+          <p class="lead reveal">MIDEC construye paisajes sonoros entre lo electrónico y lo íntimo. Cada disco es una noche distinta.</p>
         </div>
-        <svg viewBox="0 0 400 400" fill="none" stroke="#fff" stroke-opacity=".5" aria-hidden="true">
-          <circle cx="200" cy="200" r="190"/><circle cx="200" cy="200" r="140"/><circle cx="200" cy="200" r="90"/><circle cx="200" cy="200" r="40"/>
-          <path d="M10 200H390M200 10V390"/>
-        </svg>
+        <canvas id="globe-gl" aria-hidden="true"></canvas>
       </div>
     </section>
 
-    <section id="contacto">
+    <section id="gira">
       <div class="wrap">
-        <div class="panel">
+        <div class="head"><div><span class="eyebrow mono reveal">En vivo</span><h2 class="h-lg split">Gira 2026—27</h2></div></div>
+        <ul class="tour">
+          {shows.map((s) => (
+            <li class="reveal">
+              <span class="mono">{s.d}</span>
+              <div><b>{s.c}</b>{s.s && <span class="tag mono">{s.s}</span>}<br /><small>{s.v}</small></div>
+              {s.s === 'Agotado'
+                ? <span class="btn ghost">Agotado</span>
+                : <a class="btn" href="#">Entradas <span class="arr">→</span></a>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section id="contacto" style="padding-top:0">
+      <div class="wrap">
+        <div class="panel reveal">
+          <canvas id="panel-gl" aria-hidden="true"></canvas>
           <span class="mono" style="opacity:.7">Newsletter</span>
-          <h2 class="h-lg" style="margin-top:16px;max-width:720px">Sé el primero en escuchar lo nuevo.</h2>
-          <form onsubmit="event.preventDefault();this.querySelector('button').textContent='Listo ✓'">
+          <h2 class="h-lg split" style="margin-top:16px;max-width:720px">Sé el primero en escuchar lo nuevo.</h2>
+          <form id="news">
             <input type="email" required placeholder="tu@correo.com" aria-label="Correo electrónico" />
-            <button class="btn light" type="submit">Suscribirme</button>
+            <button class="btn light" type="submit">Suscribirme <span class="arr">→</span></button>
           </form>
         </div>
       </div>
@@ -111,13 +138,18 @@ const shows = [
     <footer>
       <div class="wrap">
         <div class="cols">
-          <h2 class="h">{artist}</h2>
+          <h2 class="h" style="max-width:360px">Booking, prensa y colaboraciones.</h2>
           <div><span class="mono">Escuchar</span><ul><li><a href="#">Spotify</a></li><li><a href="#">Apple Music</a></li><li><a href="#">Bandcamp</a></li></ul></div>
           <div><span class="mono">Social</span><ul><li><a href="#">Instagram</a></li><li><a href="#">YouTube</a></li><li><a href="#">TikTok</a></li></ul></div>
           <div><span class="mono">Contacto</span><ul><li><a href="mailto:booking@midec26.xyz">booking@midec26.xyz</a></li></ul></div>
         </div>
-        <small class="mono">© 2026 {artist}</small>
       </div>
+      <div class="giant" aria-hidden="true">{artist}</div>
+      <div class="wrap bar mono"><span>© 2026 {artist}</span><a href="#top">Volver arriba ↑</a></div>
     </footer>
+
+    <script>
+      import '../scripts/main.ts';
+    </script>
   </body>
 </html>

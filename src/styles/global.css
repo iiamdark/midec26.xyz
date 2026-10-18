@@ -55,8 +55,8 @@ html.intro-on .intro { display: block; }
 .face { width: clamp(120px, 16vw, 200px); height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 1440px; border: var(--line); }
 .hero .face { animation: bob 4s ease-in-out infinite; }
 @keyframes bob { 50% { transform: translateY(-8px) rotate(-3deg); } }
-.globe { position: absolute; left: 50%; bottom: 0; width: max(130vw, 900px); aspect-ratio: 1; border-radius: 1440px; background: var(--blue); border: var(--line); transform: translate(-50%, 72%); }
-.globe-text { position: absolute; left: 50%; bottom: 0; width: max(130vw, 900px); transform: translate(-50%, 26%); pointer-events: none; }
+.globe { position: absolute; left: 50%; bottom: 0; width: clamp(520px, 140vw, 190svh); aspect-ratio: 1; border-radius: 1440px; background: var(--blue); border: var(--line); transform: translate(-50%, 72%); }
+.globe-text { position: absolute; left: 50%; bottom: 0; width: clamp(520px, 140vw, 190svh); transform: translate(-50%, 26%); pointer-events: none; }
 .globe-text text { font-family: var(--display); fill: var(--white); stroke: var(--ink); stroke-width: 6px; paint-order: stroke fill; }
 .cloud { position: absolute; width: clamp(120px, 18vw, 260px); z-index: 1; }
 .cloud path { fill: var(--white); stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; }

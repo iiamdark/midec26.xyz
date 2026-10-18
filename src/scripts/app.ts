@@ -7,6 +7,10 @@ gsap.registerPlugin(ScrollTrigger);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $$ = <T extends Element = HTMLElement>(s: string, root: ParentNode = document) => Array.from(root.querySelectorAll<T>(s) as NodeListOf<T>);
 
+// Every full load starts at the top, under the intro.
+history.scrollRestoration = 'manual';
+scrollTo(0, 0);
+
 // Smooth scroll lives for the whole session (the router keeps this module alive).
 const lenis = new Lenis({ lerp: 0.1 });
 lenis.on('scroll', ScrollTrigger.update);
@@ -32,8 +36,8 @@ function splitWords(el: HTMLElement) {
 function heroIn() {
   if (!document.querySelector('.hero')) return;
   gsap.timeline()
-    .from('.globe', { y: () => innerHeight * 0.6, duration: 1.6, ease: 'expo.out' })
-    .from('.globe-text', { y: () => innerHeight * 0.5, rotation: 8, duration: 1.6, ease: 'expo.out' }, '<.1')
+    .fromTo('.globe', { y: () => innerHeight * 0.6 }, { y: 0, duration: 1.6, ease: 'expo.out' })
+    .fromTo('.globe-text', { y: () => innerHeight * 0.5, rotation: 8 }, { y: 0, rotation: 0, duration: 1.6, ease: 'expo.out' }, '<.1')
     .from('.cloud', { scale: 0, transformOrigin: '50% 50%', duration: 1, ease: 'back.out(2)', stagger: .12 }, '<.3')
     .fromTo('.hero-in', { y: -60, autoAlpha: 0, rotation: -10 }, { y: 0, autoAlpha: 1, rotation: 0, duration: 1, ease: 'back.out(2)', stagger: .08, clearProps: 'transform' }, '<');
 }
@@ -68,7 +72,10 @@ function initPage() {
 
     // Globe sinks and the arc text spins as you leave the hero.
     if (document.querySelector('.hero')) {
-      gsap.to('.globe-text', { rotation: -12, yPercent: 30, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+      // Positioning lives in GSAP so tweens never fight the CSS transform.
+      gsap.set('.globe', { x: 0, y: 0, xPercent: -50, yPercent: 72 });
+      gsap.set('.globe-text', { x: 0, y: 0, xPercent: -50, yPercent: 26 });
+      gsap.to('.globe-text', { rotation: -12, yPercent: 56, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
       gsap.to('.globe', { scale: 1.15, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
       if (introDone || !document.documentElement.classList.contains('intro-on')) heroIn();
     }
@@ -119,20 +126,21 @@ function playIntro() {
   const finish = () => { introDone = true; intro.style.display = 'none'; lenis.start(); heroIn(); };
   if (!document.documentElement.classList.contains('intro-on') || reduced) { intro.style.display = 'none'; introDone = true; return; }
   lenis.stop();
-  const web = $$<SVGPathElement>('.web path', intro);
   const fill = intro.querySelector('.head-fill')!;
-  const top = 12, bottom = 84;
-  gsap.set(web, { strokeDasharray: 1, strokeDashoffset: 1 });
-  gsap.set('.eyes-frame, .eyes-lens, .eyes-hole', { scale: 0, svgOrigin: '50 49' });
+  const top = 10, bottom = 86;
+  // Glasses and their see-through lenses (in the mask) always move together.
+  const specs = '.glasses, .lens-hole';
+  gsap.set(specs, { y: -90 });
   gsap.set('.head-line', { strokeDasharray: 1, strokeDashoffset: 1, attr: { pathLength: 1 } });
 
   // Loading: liquid red rises inside the mask while fonts and assets arrive.
+  // The wave spans far past the viewBox so ultra-wide screens stay covered.
   const state = { p: 0, amp: 1.6 };
   const wave = () => {
     const y = bottom - (bottom - top) * state.p, t = performance.now() / 260;
-    let d = `M-20 ${y}`;
-    for (let x = -20; x <= 120; x += 4) d += ` L${x} ${(y + Math.sin(x / 7 + t) * state.amp + Math.sin(x / 3 - t * 1.3) * state.amp * .35).toFixed(2)}`;
-    fill.setAttribute('d', d + ' L120 300 L-20 300 Z');
+    let d = `M-400 ${y}`;
+    for (let x = -60; x <= 160; x += 4) d += ` L${x} ${(y + Math.sin(x / 7 + t) * state.amp + Math.sin(x / 3 - t * 1.3) * state.amp * .35).toFixed(2)}`;
+    fill.setAttribute('d', d + ` L500 ${y} L500 600 L-400 600 Z`);
   };
   gsap.ticker.add(wave);
   gsap.to('.head-line', { strokeDashoffset: 0, duration: 1.1, ease: 'power3.inOut' });
@@ -147,21 +155,18 @@ function playIntro() {
   const tl = gsap.timeline({ paused: true, onComplete: () => { gsap.ticker.remove(wave); finish(); } })
     .to(state, { p: 1.05, amp: 0, duration: .6, ease: 'power2.inOut' })
     .to('.intro-name', { y: 8, opacity: 0, duration: .4, ease: 'power2.in' }, '<')
-    // Web threads spin out from the centre of the mask.
-    .to(web, { strokeDashoffset: 0, duration: .9, ease: 'power2.out', stagger: { each: .015, from: 'start' } }, '-=.2')
     // The mask punches out to fill the screen.
-    .to('.head-shape, .head-line', { scale: 7, svgOrigin: '50 49', duration: 1.1, ease: 'expo.inOut' }, '<.2')
-    .set(state, { p: 4 }, '<.3')
-    .to('.head-line', { opacity: 0, duration: .4 }, '<.5')
-    // Eyes snap open, look around, blink.
-    .to('.eyes-frame, .eyes-lens, .eyes-hole', { scale: 1, duration: .9, ease: 'elastic.out(1, .55)' }, '-=.45')
-    .to('.eyes-frame, .eyes-lens', { x: -1.6, duration: .25, ease: 'power2.inOut' }, '+=.15')
-    .to('.eyes-frame, .eyes-lens', { x: 1.6, duration: .35, ease: 'power2.inOut' })
-    .to('.eyes-frame, .eyes-lens', { x: 0, duration: .25, ease: 'power2.inOut' })
-    .to('.eyes-lens, .eyes-frame', { scaleY: .1, svgOrigin: '50 50', duration: .09, repeat: 1, yoyo: true, ease: 'power2.in' }, '+=.05')
-    // Squint, then the left eye dives toward the viewer.
-    .to('.eyes-lens', { opacity: 0, duration: .25 }, '+=.1')
-    .to('.eyes-hole, .eyes-frame', { scale: 60, rotation: -8, svgOrigin: '37 48', duration: 1.2, ease: 'expo.in' }, '-=.05')
+    .to('.head-shape, .head-line, .head-shade', { scale: 8, svgOrigin: '50 49', duration: 1, ease: 'expo.inOut' }, '-=.1')
+    .set(state, { p: 5 }, '<.3')
+    .to('.head-line', { opacity: 0, duration: .3 }, '<.4')
+    // "Deal with it": the pixel glasses drop onto the face.
+    .to(specs, { y: 0, duration: .9, ease: 'bounce.out' }, '-=.2')
+    .fromTo('.glint', { opacity: 0 }, { opacity: 1, duration: .08, repeat: 3, yoyo: true, ease: 'steps(1)' }, '+=.1')
+    .to('.glint', { opacity: 1, duration: .01 })
+    // Lenses turn see-through, then the left one dives toward the viewer.
+    .to('.lens-hole', { opacity: 1, duration: .45, ease: 'power2.inOut' }, '+=.25')
+    .to('.glint', { opacity: 0, duration: .2 }, '<')
+    .to(specs, { scale: 70, svgOrigin: '34 44', duration: 1.15, ease: 'expo.in' }, '+=.2')
     .to('.skip', { opacity: 0, duration: .3 }, '<');
   loaded.then(() => { fake.kill(); tl.play(); });
   intro.querySelector('.skip')!.addEventListener('click', () => { fake.kill(); tl.progress(1); });

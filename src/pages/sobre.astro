@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { artist, formerly } from '../data';
+import { artist, formerly, songs } from '../data';
 ---
 <Layout title="Sobre">
   <section class="pad page-head">
@@ -8,10 +8,22 @@ import { artist, formerly } from '../data';
   </section>
   <section class="pad about">
     <div>
-      <p class="reveal">{artist} es el proyecto que antes conocías como {formerly}.</p>
-      <p class="reveal">Paisajes sonoros entre lo electrónico y lo íntimo, hechos de noche y en solitario.</p>
-      <p class="reveal">El cambio de nombre no borra nada: cada canción de {formerly} sigue aquí, y cada disco nuevo es otra noche distinta.</p>
+      <p class="reveal">{artist} es un artista emergente español que está empezando a hacer canciones. Antes firmaba como {formerly}.</p>
+      <p class="reveal">Su terreno es el género urbano: canciones cortas e intensas, visualizers hechos a mano y videoclips como «Entre Sombras y Luces».</p>
+      <p class="reveal">Todo lo publica en su canal de YouTube, donde cada lanzamiento suma una nueva pieza al proyecto.</p>
     </div>
+    <div class="photo-stack pop">
+      <img src="/img/okZgYt5MAJ4.jpg" alt={`${artist} en el videoclip de Entre Sombras y Luces`} width="1280" height="720" loading="lazy" />
+      <img src="/img/markho.jpg" alt={`Retrato de ${artist}`} width="900" height="900" loading="lazy" class="face" />
+    </div>
+  </section>
+  <section class="pad facts">
+    <div class="fact pop"><b data-count={songs.length}>0</b><span class="cap">Canciones publicadas</span></div>
+    <div class="fact pop"><b>ES</b><span class="cap">Desde España</span></div>
+    <div class="fact pop"><b>2025</b><span class="cap">Primer videoclip</span></div>
+  </section>
+  <section class="pad about" style="padding-bottom:10vh">
     <div class="orb pop"><canvas id="globe-gl" aria-hidden="true"></canvas></div>
+    <p class="reveal" style="font-size:clamp(32px,4vw,50px);line-height:.9">De {formerly} a {artist}: el mismo pulso, un nombre nuevo.</p>
   </section>
 </Layout>

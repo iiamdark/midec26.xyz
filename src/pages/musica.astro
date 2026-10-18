@@ -1,22 +1,31 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Cloud from '../components/Cloud.astro';
-import { releases } from '../data';
+import SongDisc from '../components/SongDisc.astro';
+import { songs, youtube } from '../data';
 ---
 <Layout title="Música">
   <section class="pad page-head scene" style="min-height:auto">
     <Cloud style="top:22%;right:6%" speed={0.8} />
     <h1 class="h1 split">Música</h1>
-    <p class="reveal">Discos, EPs y sencillos. Pasa el cursor por un disco para darle vuelta.</p>
+    <p class="reveal">Todas las canciones de Markho. Toca un disco para escucharlo aquí mismo.</p>
   </section>
   <section class="pad">
     <div class="discs">
-      {releases.map((r) => (
-        <a class={`disc pop ${r.color}`} href="#">
-          <span class="h2">{r.t}</span>
-          <span class="cap">{r.k} · {r.y} · {r.tracks} {r.tracks === 1 ? 'tema' : 'temas'}</span>
-        </a>
-      ))}
+      {songs.map((s, i) => <SongDisc song={s} index={i} />)}
     </div>
+    <ol class="tracklist reveal">
+      {songs.map((s, i) => (
+        <li>
+          <button type="button" data-play={s.id} data-title={s.t}>
+            <span class="cap">{String(i + 1).padStart(2, '0')}</span>
+            <span class="t">{s.t}</span>
+            <span class="cap">{s.k}</span>
+            <span class="cap">{s.dur}</span>
+          </button>
+        </li>
+      ))}
+    </ol>
+    <p style="padding:45px 0 10vh"><a class="btn" href={youtube} target="_blank" rel="noopener">Ver canal en YouTube ↗</a></p>
   </section>
 </Layout>

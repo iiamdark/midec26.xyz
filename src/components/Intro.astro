@@ -1,13 +1,14 @@
 ---
-// Intro: a hero mask (web pattern, angular lenses). The left lens zooms in and
-// becomes the window through which the site is revealed.
-const C = { x: 50, y: 50 };
+// Loader + intro. The mask fills with liquid red as the page loads, floods the
+// screen, the eyes open and blink, and the left lens zooms in to become the
+// window through which the site is revealed.
+const C = { x: 50, y: 49 };
 const spokes = Array.from({ length: 16 }, (_, i) => {
   const a = (i / 16) * Math.PI * 2;
-  return `M${C.x} ${C.y} L${C.x + Math.cos(a) * 120} ${C.y + Math.sin(a) * 120}`;
+  return `M${C.x} ${C.y} L${C.x + Math.cos(a) * 160} ${C.y + Math.sin(a) * 160}`;
 });
 // concentric webs: polygons with slight inward sag between spokes
-const rings = [8, 16, 26, 38, 52, 68, 86].map((r) => {
+const rings = [7, 14, 23, 34, 47, 62, 80, 100, 124].map((r) => {
   let d = '';
   for (let i = 0; i <= 16; i++) {
     const a = (i / 16) * Math.PI * 2, b = ((i - 0.5) / 16) * Math.PI * 2;
@@ -17,24 +18,31 @@ const rings = [8, 16, 26, 38, 52, 68, 86].map((r) => {
   }
   return d;
 });
-const L = 'M20 41 Q31 32 45 45 Q42 56 34 57 Q23 56 20 41 Z';
-const R = 'M80 41 Q69 32 55 45 Q58 56 66 57 Q77 56 80 41 Z';
+const HEAD = 'M50 14 C70 14 80 30 79 48 C78 66 66 82 50 84 C34 82 22 66 21 48 C20 30 30 14 50 14 Z';
+const L = 'M27 43 Q35 34 46.5 46 Q44.5 55.5 37 56.5 Q28.5 55.5 27 43 Z';
+const R = 'M73 43 Q65 34 53.5 46 Q55.5 55.5 63 56.5 Q71.5 55.5 73 43 Z';
 ---
 <div class="intro" aria-hidden="true" transition:persist>
-  <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+  <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
     <defs>
       <mask id="intro-mask" maskUnits="userSpaceOnUse" x="-500" y="-500" width="1100" height="1100">
         <rect x="-500" y="-500" width="1100" height="1100" fill="#fff" />
         <g class="eyes-hole"><path d={L} fill="#000" /><path d={R} fill="#000" /></g>
       </mask>
+      <clipPath id="head-clip"><path class="head-shape" d={HEAD} /></clipPath>
     </defs>
     <g mask="url(#intro-mask)">
-      <rect x="-500" y="-500" width="1100" height="1100" fill="#ef3b2c" />
-      <g class="web" fill="none" stroke="#333" stroke-width=".35" stroke-linecap="round">
-        {spokes.map((d) => <path d={d} pathLength="1" />)}
-        {rings.map((d) => <path d={d} pathLength="1" />)}
+      <rect x="-500" y="-500" width="1100" height="1100" fill="#ffe600" />
+      <g clip-path="url(#head-clip)">
+        <path class="head-fill" fill="#ef3b2c" d="M-500 84 L600 84 L600 600 L-500 600 Z" />
+        <g class="web" fill="none" stroke="#333" stroke-width=".3" stroke-linecap="round">
+          {spokes.map((d) => <path d={d} pathLength="1" />)}
+          {rings.map((d) => <path d={d} pathLength="1" />)}
+        </g>
       </g>
-      <g class="eyes-frame" fill="none" stroke="#333" stroke-width="2.2" stroke-linejoin="round">
+      <path class="head-line" d={HEAD} fill="none" stroke="#333" stroke-width="1.2" stroke-linejoin="round" />
+      <text class="intro-name" x="50" y="95" text-anchor="middle" font-size="7" fill="#333">MARKHO</text>
+      <g class="eyes-frame" fill="none" stroke="#333" stroke-width="1.8" stroke-linejoin="round">
         <path d={L} /><path d={R} />
       </g>
       <g class="eyes-lens" fill="#fff">
@@ -42,5 +50,5 @@ const R = 'M80 41 Q69 32 55 45 Q58 56 66 57 Q77 56 80 41 Z';
       </g>
     </g>
   </svg>
-  <button class="skip cap" type="button">Saltar intro</button>
+  <button class="skip cap" type="button">Saltar intro →</button>
 </div>

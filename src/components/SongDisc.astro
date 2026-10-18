@@ -1,0 +1,14 @@
+---
+import { thumb, type Song } from '../data';
+interface Props { song: Song; index?: number }
+const { song, index } = Astro.props;
+---
+<button type="button" class={`disc pop ${song.color}`} data-play={song.id} data-title={song.t} aria-label={`Reproducir ${song.t}`}>
+  <img src={thumb(song.id)} alt="" loading="lazy" width="1280" height="720" />
+  <span class="disc-play" aria-hidden="true">▶</span>
+  <span class="disc-label">
+    {index !== undefined && <span class="cap">{String(index + 1).padStart(2, '0')}</span>}
+    <span class="h3">{song.t}</span>
+    <span class="cap">{song.k} · {song.y} · {song.dur}</span>
+  </span>
+</button>

@@ -19,7 +19,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta name="theme-color" content="#ffe600" />
     <link rel="icon" href="/favicon.svg" />
     <script is:inline>
-      try { if (!sessionStorage.getItem('intro')) document.documentElement.classList.add('intro-on'); } catch (e) {}
+      document.documentElement.classList.add('intro-on');
     </script>
     <ClientRouter />
   </head>
@@ -37,10 +37,18 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       <div class="giant" aria-hidden="true">{artist}</div>
       <div class="row">
         <span>© 2026 {artist} · antes {formerly}</span>
-        <ul>{socials.map((s) => <li><a href={s.href}>{s.label}</a></li>)}</ul>
+        <ul>{socials.map((s) => <li><a href={s.href} target="_blank" rel="noopener">{s.label} ↗</a></li>)}</ul>
         <a href={`mailto:${email}`}>{email}</a>
       </div>
     </footer>
+
+    <dialog class="player" transition:persist aria-label="Reproductor">
+      <div class="player-bar">
+        <span class="sub player-title"></span>
+        <button type="button" class="player-close" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="player-frame"></div>
+    </dialog>
 
     <script>
       import '../scripts/app.ts';

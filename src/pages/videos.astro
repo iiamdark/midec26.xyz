@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Cloud from '../components/Cloud.astro';
+import { songs, thumb, youtube } from '../data';
+---
+<Layout title="Vídeos">
+  <section class="pad page-head scene" style="min-height:auto">
+    <Cloud style="top:18%;right:10%" speed={1.1} />
+    <h1 class="h1 split">Vídeos</h1>
+    <p class="reveal">Videoclips y visualizers del canal.</p>
+  </section>
+  <section class="pad videos">
+    {songs.map((s, i) => (
+      <article class="video reveal">
+        <button type="button" class="video-media" data-play={s.id} data-title={s.t} aria-label={`Reproducir ${s.t}`}>
+          <img src={thumb(s.id)} alt="" width="1280" height="720" loading={i ? 'lazy' : 'eager'} />
+          <span class="disc-play" aria-hidden="true">▶</span>
+        </button>
+        <div class="video-info">
+          <span class="cap">{s.k} · {s.y} · {s.dur}</span>
+          <h2 class="h2">{s.t}</h2>
+        </div>
+      </article>
+    ))}
+    <p style="padding:20px 0 10vh"><a class="btn" href={youtube} target="_blank" rel="noopener">Suscríbete en YouTube ↗</a></p>
+  </section>
+</Layout>

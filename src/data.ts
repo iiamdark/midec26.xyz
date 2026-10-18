@@ -1,35 +1,33 @@
-// Contenido de relleno: reemplazar con los datos reales de Markho.
+// Datos sacados del canal de YouTube @MarkhoES (octubre 2026).
 export const artist = 'MARKHO';
 export const formerly = 'midec26';
+export const tagline = 'Artista emergente español · Género urbano';
 
 export const nav = [
   { href: '/', label: 'Inicio' },
   { href: '/musica', label: 'Música' },
-  { href: '/gira', label: 'Gira' },
+  { href: '/videos', label: 'Vídeos' },
   { href: '/sobre', label: 'Sobre' },
   { href: '/contacto', label: 'Contacto' },
 ];
 
-export const releases = [
-  { slug: 'nocturno', t: 'Nocturno', y: '2026', k: 'Álbum', tracks: 11, color: 'blue' },
-  { slug: 'vacio', t: 'Vacío', y: '2025', k: 'EP', tracks: 5, color: 'coral' },
-  { slug: 'senal', t: 'Señal', y: '2025', k: 'Sencillo', tracks: 1, color: 'white' },
-  { slug: 'marea', t: 'Marea', y: '2024', k: 'Sencillo', tracks: 1, color: 'blue' },
+export const youtube = 'https://www.youtube.com/@MarkhoES';
+export const instagram = 'https://www.instagram.com/marc_puente08';
+export const email = 'midecubos@gmail.com';
+
+export interface Song { id: string; t: string; k: string; y: string; dur: string; color: 'blue' | 'coral' | 'white' }
+// Más reciente primero.
+export const songs: Song[] = [
+  { id: 'YGt95E2D3go', t: 'San Valentín', k: 'Visualizer', y: '2026', dur: '2:53', color: 'coral' },
+  { id: 'BWlaL_6-JOE', t: 'Como si nada', k: 'Visualizer', y: '2026', dur: '2:11', color: 'blue' },
+  { id: 'okZgYt5MAJ4', t: 'Entre Sombras y Luces', k: 'Videoclip oficial', y: '2025', dur: '2:53', color: 'white' },
+  { id: 'OWHzjMbR9uQ', t: 'Si Estuvieras Aquí', k: 'Cover', y: '2025', dur: '3:29', color: 'blue' },
 ];
 
-export const shows = [
-  { d: '14 NOV', y: '2026', c: 'Ciudad de México', v: 'Foro Indie Rocks', s: 'Últimas' },
-  { d: '28 NOV', y: '2026', c: 'Bogotá', v: 'Teatro Royal Center' },
-  { d: '12 DIC', y: '2026', c: 'Buenos Aires', v: 'Niceto Club', s: 'Agotado' },
-  { d: '20 ENE', y: '2027', c: 'Madrid', v: 'Sala But' },
-  { d: '03 FEB', y: '2027', c: 'Barcelona', v: 'Razzmatazz 2' },
-];
+export const thumb = (id: string) => `/img/${id}.jpg`;
+export const watch = (id: string) => `https://www.youtube.com/watch?v=${id}`;
 
 export const socials = [
-  { label: 'Spotify', href: '#' },
-  { label: 'Instagram', href: '#' },
-  { label: 'YouTube', href: '#' },
-  { label: 'TikTok', href: '#' },
+  { label: 'YouTube', href: youtube },
+  { label: 'Instagram', href: instagram },
 ];
-
-export const email = 'booking@midec26.xyz';

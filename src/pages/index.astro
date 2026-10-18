@@ -1,26 +1,30 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Cloud from '../components/Cloud.astro';
-import { artist, formerly, releases } from '../data';
+import SongDisc from '../components/SongDisc.astro';
+import { artist, formerly, songs, tagline, thumb } from '../data';
+const latest = songs[0];
 ---
 <Layout>
   <section class="scene hero">
-    <Cloud style="top:18%;left:6%" speed={0.6} />
-    <Cloud style="top:32%;right:8%;width:clamp(160px,22vw,320px)" speed={1.2} />
-    <Cloud style="top:62%;left:22%;width:clamp(90px,12vw,170px)" speed={0.9} />
-    <div class="tag">
-      <span class="badge cap hero-in">Nuevo álbum · Nocturno</span>
+    <Cloud style="top:20%;left:5%" speed={0.6} />
+    <Cloud style="top:40%;right:6%;width:clamp(160px,22vw,320px)" speed={1.2} />
+    <Cloud style="top:64%;left:20%;width:clamp(90px,12vw,170px)" speed={0.9} />
+    <div class="hero-top">
+      <img class="face hero-in" src="/img/markho.jpg" alt={`Foto de ${artist}`} width="900" height="900" />
+      <span class="badge cap hero-in">{tagline}</span>
+      <button type="button" class="btn hero-in" data-play={latest.id} data-title={latest.t}>▶ Escuchar «{latest.t}»</button>
     </div>
     <div class="globe" data-globe></div>
     <svg class="globe-text" viewBox="0 0 1000 500" aria-label={artist}>
       <path id="arc" d="M60 470 A520 520 0 0 1 940 470" fill="none" />
-      <text font-size="190" text-anchor="middle"><textPath href="#arc" startOffset="50%" class="arc-text">{artist}</textPath></text>
+      <text font-size="190" text-anchor="middle"><textPath href="#arc" startOffset="50%">{artist}</textPath></text>
     </svg>
   </section>
 
   <div class="marquee" aria-hidden="true">
     <div class="track">
-      {[0, 1].map(() => ['Nocturno', 'Gira 2026', artist, 'Nuevo álbum', 'En vivo'].map((w) => <span>{w}</span>))}
+      {[0, 1].map(() => [...songs.map((s) => s.t), artist].map((w) => <span>{w}</span>))}
     </div>
   </div>
 
@@ -29,26 +33,33 @@ import { artist, formerly, releases } from '../data';
       <span class="split">Antes</span> <span class="strike" data-strike>{formerly}.</span><br />
       <span class="split">Ahora {artist}.</span>
     </h2>
-    <p class="sub reveal" style="max-width:520px;margin-top:45px">Mismo pulso, nuevo nombre. Un capítulo nuevo empieza con <em>Nocturno</em>, el primer álbum como {artist}.</p>
+    <p class="sub reveal" style="max-width:560px;margin-top:45px">Artista emergente español que está empezando a hacer canciones. Música urbana, visuales propios y muchas ganas.</p>
+  </section>
+
+  <section class="pad feature">
+    <button type="button" class="feature-media pop" data-play={latest.id} data-title={latest.t} aria-label={`Reproducir ${latest.t}`}>
+      <img src={thumb(latest.id)} alt="" width="1280" height="720" loading="lazy" />
+      <span class="disc-play" aria-hidden="true">▶</span>
+    </button>
+    <div>
+      <span class="badge cap reveal">Último lanzamiento</span>
+      <h2 class="h1 split" style="margin-top:20px">{latest.t}</h2>
+      <p class="sub reveal" style="margin-top:20px">{latest.k} · {latest.y} · {latest.dur}</p>
+    </div>
   </section>
 
   <section class="pad">
-    <h2 class="h2 split" style="margin-bottom:45px">Lo último</h2>
+    <h2 class="h2 split" style="margin-bottom:45px">Canciones</h2>
     <div class="discs">
-      {releases.slice(0, 3).map((r) => (
-        <a class={`disc pop ${r.color}`} href="/musica">
-          <span class="h2">{r.t}</span>
-          <span class="cap">{r.k} · {r.y}</span>
-        </a>
-      ))}
+      {songs.slice(1).map((s) => <SongDisc song={s} />)}
     </div>
   </section>
 
   <section class="pad">
     <div class="next">
-      <a href="/gira" class="pop">Gira →</a>
+      <a href="/musica" class="pop">Música →</a>
+      <a href="/videos" class="pop">Vídeos →</a>
       <a href="/sobre" class="pop">Sobre →</a>
-      <a href="/contacto" class="pop">Contacto →</a>
     </div>
   </section>
 </Layout>

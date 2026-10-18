@@ -15,7 +15,10 @@ gsap.ticker.lagSmoothing(0);
 
 // Nav hides while scrolling down.
 const nav = document.querySelector('nav.top')!;
-lenis.on('scroll', (l: Lenis) => nav.classList.toggle('hide', l.direction === 1 && l.scroll > 120));
+lenis.on('scroll', (l: Lenis) => {
+  nav.classList.toggle('hide', l.direction === 1 && l.scroll > 120);
+  nav.classList.toggle('solid', l.scroll > 40);
+});
 
 let ctx: gsap.Context | undefined;
 let introDone = false;
@@ -32,7 +35,7 @@ function heroIn() {
     .from('.globe', { y: () => innerHeight * 0.6, duration: 1.6, ease: 'expo.out' })
     .from('.globe-text', { y: () => innerHeight * 0.5, rotation: 8, duration: 1.6, ease: 'expo.out' }, '<.1')
     .from('.cloud', { scale: 0, transformOrigin: '50% 50%', duration: 1, ease: 'back.out(2)', stagger: .12 }, '<.3')
-    .from('.hero-in', { y: -60, autoAlpha: 0, rotation: -10, duration: 1, ease: 'back.out(2)' }, '<');
+    .fromTo('.hero-in', { y: -60, autoAlpha: 0, rotation: -10 }, { y: 0, autoAlpha: 1, rotation: 0, duration: 1, ease: 'back.out(2)', stagger: .08, clearProps: 'transform' }, '<');
 }
 
 function initPage() {
@@ -54,7 +57,7 @@ function initPage() {
       gsap.from(el, { y: 50, autoAlpha: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 92%' } }));
     ScrollTrigger.batch('.pop', {
       start: 'top 92%', once: true,
-      onEnter: (els) => gsap.from(els, { scale: .4, rotation: -12, autoAlpha: 0, duration: 1, ease: 'back.out(1.8)', stagger: .1 }),
+      onEnter: (els) => gsap.fromTo(els, { scale: .4, rotation: -12, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1, ease: 'back.out(1.8)', stagger: .1, clearProps: 'transform' }),
     });
 
     // Clouds bob and drift with scroll.
@@ -69,6 +72,11 @@ function initPage() {
       gsap.to('.globe', { scale: 1.15, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
       if (introDone || !document.documentElement.classList.contains('intro-on')) heroIn();
     }
+
+    $$('[data-count]').forEach((el) => {
+      const o = { v: 0 };
+      gsap.to(o, { v: +el.dataset.count!, duration: 1.6, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%' }, onUpdate: () => (el.textContent = String(Math.round(o.v))) });
+    });
 
     // "midec26" gets crossed out.
     $$('[data-strike]').forEach((el) =>
@@ -105,23 +113,77 @@ function initPage() {
   });
 }
 
-// Mask intro, once per browser session.
+// Mask loader + intro on every full page load.
 function playIntro() {
   const intro = document.querySelector<HTMLElement>('.intro')!;
   const finish = () => { introDone = true; intro.style.display = 'none'; lenis.start(); heroIn(); };
   if (!document.documentElement.classList.contains('intro-on') || reduced) { intro.style.display = 'none'; introDone = true; return; }
-  try { sessionStorage.setItem('intro', '1'); } catch {}
   lenis.stop();
   const web = $$<SVGPathElement>('.web path', intro);
+  const fill = intro.querySelector('.head-fill')!;
+  const top = 12, bottom = 84;
   gsap.set(web, { strokeDasharray: 1, strokeDashoffset: 1 });
-  const tl = gsap.timeline({ onComplete: finish })
-    .to(web, { strokeDashoffset: 0, duration: 1, ease: 'power2.inOut', stagger: .025 })
-    .from('.eyes-frame, .eyes-lens', { scale: 0, svgOrigin: '50 46', duration: .7, ease: 'back.out(2)' }, '-=.6')
-    .to('.eyes-lens', { scaleY: .08, svgOrigin: '50 47', duration: .12, repeat: 3, yoyo: true, ease: 'power2.in' }, '+=.3')
-    .to('.eyes-lens', { opacity: 0, duration: .35 }, '+=.2')
-    .to('.eyes-hole, .eyes-frame', { scale: 45, svgOrigin: '33 46', duration: 1.3, ease: 'expo.in' }, '+=.35');
-  intro.querySelector('.skip')!.addEventListener('click', () => tl.progress(1));
+  gsap.set('.eyes-frame, .eyes-lens, .eyes-hole', { scale: 0, svgOrigin: '50 49' });
+  gsap.set('.head-line', { strokeDasharray: 1, strokeDashoffset: 1, attr: { pathLength: 1 } });
+
+  // Loading: liquid red rises inside the mask while fonts and assets arrive.
+  const state = { p: 0, amp: 1.6 };
+  const wave = () => {
+    const y = bottom - (bottom - top) * state.p, t = performance.now() / 260;
+    let d = `M-20 ${y}`;
+    for (let x = -20; x <= 120; x += 4) d += ` L${x} ${(y + Math.sin(x / 7 + t) * state.amp + Math.sin(x / 3 - t * 1.3) * state.amp * .35).toFixed(2)}`;
+    fill.setAttribute('d', d + ' L120 300 L-20 300 Z');
+  };
+  gsap.ticker.add(wave);
+  gsap.to('.head-line', { strokeDashoffset: 0, duration: 1.1, ease: 'power3.inOut' });
+  gsap.from('.intro-name', { y: 6, opacity: 0, duration: .9, ease: 'back.out(2)', delay: .3 });
+  const fake = gsap.to(state, { p: .82, duration: 2.4, ease: 'power2.out', delay: .4 });
+  const loaded = Promise.all([
+    document.fonts.ready,
+    document.readyState === 'complete' ? null : new Promise((r) => addEventListener('load', r, { once: true })),
+    new Promise((r) => setTimeout(r, 2000)),
+  ]);
+
+  const tl = gsap.timeline({ paused: true, onComplete: () => { gsap.ticker.remove(wave); finish(); } })
+    .to(state, { p: 1.05, amp: 0, duration: .6, ease: 'power2.inOut' })
+    .to('.intro-name', { y: 8, opacity: 0, duration: .4, ease: 'power2.in' }, '<')
+    // Web threads spin out from the centre of the mask.
+    .to(web, { strokeDashoffset: 0, duration: .9, ease: 'power2.out', stagger: { each: .015, from: 'start' } }, '-=.2')
+    // The mask punches out to fill the screen.
+    .to('.head-shape, .head-line', { scale: 7, svgOrigin: '50 49', duration: 1.1, ease: 'expo.inOut' }, '<.2')
+    .set(state, { p: 4 }, '<.3')
+    .to('.head-line', { opacity: 0, duration: .4 }, '<.5')
+    // Eyes snap open, look around, blink.
+    .to('.eyes-frame, .eyes-lens, .eyes-hole', { scale: 1, duration: .9, ease: 'elastic.out(1, .55)' }, '-=.45')
+    .to('.eyes-frame, .eyes-lens', { x: -1.6, duration: .25, ease: 'power2.inOut' }, '+=.15')
+    .to('.eyes-frame, .eyes-lens', { x: 1.6, duration: .35, ease: 'power2.inOut' })
+    .to('.eyes-frame, .eyes-lens', { x: 0, duration: .25, ease: 'power2.inOut' })
+    .to('.eyes-lens, .eyes-frame', { scaleY: .1, svgOrigin: '50 50', duration: .09, repeat: 1, yoyo: true, ease: 'power2.in' }, '+=.05')
+    // Squint, then the left eye dives toward the viewer.
+    .to('.eyes-lens', { opacity: 0, duration: .25 }, '+=.1')
+    .to('.eyes-hole, .eyes-frame', { scale: 60, rotation: -8, svgOrigin: '37 48', duration: 1.2, ease: 'expo.in' }, '-=.05')
+    .to('.skip', { opacity: 0, duration: .3 }, '<');
+  loaded.then(() => { fake.kill(); tl.play(); });
+  intro.querySelector('.skip')!.addEventListener('click', () => { fake.kill(); tl.progress(1); });
 }
+
+// YouTube player in a dialog; any [data-play] element opens it.
+const player = document.querySelector<HTMLDialogElement>('dialog.player')!;
+const frame = player.querySelector<HTMLElement>('.player-frame')!;
+const closePlayer = () => {
+  gsap.to(player, { scale: .85, rotation: 4, opacity: 0, duration: .3, ease: 'power2.in', onComplete: () => { player.close(); frame.innerHTML = ''; } });
+};
+document.addEventListener('click', (e) => {
+  const btn = (e.target as Element).closest<HTMLElement>('[data-play]');
+  if (!btn) return;
+  player.querySelector('.player-title')!.textContent = btn.dataset.title || '';
+  frame.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${btn.dataset.play}?autoplay=1&rel=0" title="${btn.dataset.title || 'YouTube'}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+  player.showModal();
+  gsap.fromTo(player, { scale: .6, rotation: -6, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: .7, ease: 'back.out(1.7)' });
+});
+player.querySelector('.player-close')!.addEventListener('click', closePlayer);
+player.addEventListener('cancel', (e) => { e.preventDefault(); closePlayer(); });
+player.addEventListener('click', (e) => { if (e.target === player) closePlayer(); });
 
 document.addEventListener('astro:before-swap', () => { ctx?.revert(); ScrollTrigger.getAll().forEach((t) => t.kill()); });
 document.addEventListener('astro:after-swap', () => lenis.scrollTo(0, { immediate: true }));

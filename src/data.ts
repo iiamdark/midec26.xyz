@@ -29,12 +29,59 @@ export interface Song {
   spotify: string; apple?: string; youtube?: string; explicit?: boolean; color: Color;
   credits?: Credits;
   // Letra: estrofas separadas por una línea en blanco. Una línea que empieza
-  // por "* " se muestra como frase destacada.
+  // por "* " es una frase destacada y una que empieza por "> " es hablada.
+  // Las estrofas repetidas se marcan solas como estribillo.
   lyrics?: string;
+  // Decoración animada junto a la letra.
+  decor?: 'heart';
 }
 // Singles en Spotify, más reciente primero.
 export const songs: Song[] = [
-  { slug: 'san-valentin', apple: 'https://music.apple.com/es/album/san-valent%C3%ADn/6792689093?i=6792689094', t: 'San Valentín', date: '2026-07-24', dur: '2:51', spotify: '0FDdG1ZYNEHfE83WNCAp3u', youtube: 'YGt95E2D3go', explicit: true, color: 'coral' },
+  { slug: 'san-valentin', apple: 'https://music.apple.com/es/album/san-valent%C3%ADn/6792689093?i=6792689094', t: 'San Valentín', date: '2026-07-24', dur: '2:51', spotify: '0FDdG1ZYNEHfE83WNCAp3u', youtube: 'YGt95E2D3go', explicit: true, color: 'coral', decor: 'heart',
+    lyrics: `Extraño tu cama como si fuera mía
+Que tú me echas de menos eso ya lo sabía
+Que tu madre y tu padre aún me tienen manía
+Me hubiese gustado tener la cercanía
+
+De decírtelo a ti
+Y ahora que estoy solo letras tristes voa' escribir
+Encima lo dejamos el día de San Valentín
+* Cupido me ha castigado por ser tan infantil
+
+No nos llevamos bien así que mami ya vete
+Que tus mensajes se sienten como un machete
+* Seguiré llorando por ti aunque tenga 27
+Me duele la barriga, no me llena un banquete
+Me llenan tus gemidos que gritas cuando te vienes
+
+Al final no tuvimos nenes
+Secuestrados como dos rehenes
+En este amor que no se sostiene
+Tú que que coger dos trenes
+
+Pa' coger mi sudadera que aún la tenías tú
+* Y no tuve el valor
+
+De decírtelo a ti
+Y ahora que estoy solo letras tristes voa' escribir
+Encima lo dejamos el día de San Valentín
+Cupido me ha castigado por ser tan infantil
+
+No nos llevamos bien así que mami ya vete
+
+> Al final todo pasa por algo
+> Si el mundo no quiere, no tenemos por qué empeñarnos a estar juntos
+> Has sido lo más bonito que me ha pasado en mi vida, la verdad
+> Y sé que nunca te lo digo porque me cuesta
+> Pero creo que por fin puedo decir que he tenido el valor
+
+De decírtelo a ti
+Y ahora que estoy solo letras tristes voa' escribir
+Encima lo dejamos el día de San Valentín
+Cupido me ha castigado por ser tan infantil
+
+* No nos llevamos bien así que mami ya vete`,
+  },
   { slug: 'otra-noche-mala', apple: 'https://music.apple.com/es/album/otra-noche-mala/6773278814?i=6773278815', t: 'otra noche mala', date: '2026-06-05', dur: '2:50', spotify: '31nBNBk0WTlY2ImhqL0by4', color: 'blue' },
   { slug: 'como-si-nada', apple: 'https://music.apple.com/es/album/como-si-nada/6777631745?i=6777631746', t: 'como si nada', date: '2026-05-24', dur: '2:14', spotify: '5tKnfZkIQIlqz6WyEGniTE', youtube: 'BWlaL_6-JOE', color: 'white' },
   { slug: 'ella-ella-ella', apple: 'https://music.apple.com/es/album/ella-ella-ella/1889116083?i=1889116084', t: 'Ella Ella Ella', date: '2026-03-05', dur: '2:45', spotify: '7034S4K1kVbdCmIWaM2HfH', explicit: true, color: 'coral' },

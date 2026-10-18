@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { songs, cover, fmtDate, thumb, artist, label, platforms, email, type Song } from '../../data';
+import Lyrics from '../../components/Lyrics.astro';
+import { songs, cover, fmtDate, thumb, artist, label, platforms, type Song } from '../../data';
 
 export function getStaticPaths() {
   return songs.map((song, i) => ({ params: { slug: song.slug }, props: { song, i } }));
@@ -20,7 +21,6 @@ const credits = [
   ['Sello', `${label} · ℗ ${year}`],
   ['Lanzamiento', fmtDate(song.date)],
 ].filter(([, v]) => v) as [string, string][];
-const stanzas = song.lyrics?.trim().split(/\n\s*\n/).map((st) => st.split('\n').map((l) => l.trim()));
 ---
 <Layout title={song.t} description={`«${song.t}» de ${artist}. Single publicado el ${fmtDate(song.date)}.`} image={cover(song)}>
   <section class="pad song-hero">
@@ -54,22 +54,7 @@ const stanzas = song.lyrics?.trim().split(/\n\s*\n/).map((st) => st.split('\n').
     </section>
   )}
 
-  <section class="pad lyrics-block">
-    <h2 class="h2 split" style="margin-bottom:45px">Letra</h2>
-    {stanzas ? (
-      <div class="lyrics">
-        {stanzas.map((st) => (
-          <p class="stanza">
-            {st.map((l) => l.startsWith('* ')
-              ? <span class="lyric hl">{l.slice(2)}</span>
-              : <span class="lyric">{l}</span>)}
-          </p>
-        ))}
-      </div>
-    ) : (
-      <p class="lyrics-soon reveal">La letra de «{song.t}» llegará pronto. ¿La quieres ya? Escríbele a <a href={`mailto:${email}`}>{email}</a>.</p>
-    )}
-  </section>
+  <Lyrics song={song} />
 
   <section class="pad credits-block">
     <h2 class="h2 split" style="margin-bottom:45px">Créditos</h2>

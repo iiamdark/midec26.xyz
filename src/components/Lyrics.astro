@@ -1,0 +1,73 @@
+---
+import { email, type Song } from '../data';
+interface Props { song: Song }
+const { song } = Astro.props;
+
+type Line = { text: string; kind: 'line' | 'hl' | 'spoken' };
+const parse = (l: string): Line =>
+  l.startsWith('* ') ? { text: l.slice(2), kind: 'hl' }
+  : l.startsWith('> ') ? { text: l.slice(2), kind: 'spoken' }
+  : { text: l, kind: 'line' };
+
+// A stanza whose opening line shows up in more than one stanza is the chorus.
+const blocks = (song.lyrics?.trim() || '')
+  .split(/\n\s*\n/).filter(Boolean)
+  .map((block) => block.split('\n').map((l) => parse(l.trim())));
+const opening = (lines: Line[]) => lines[0]?.text.toLowerCase() ?? '';
+const count = new Map<string, number>();
+blocks.forEach((b) => count.set(opening(b), (count.get(opening(b)) ?? 0) + 1));
+const stanzas = blocks.map((lines) => ({
+  lines,
+  chorus: (count.get(opening(lines)) ?? 0) > 1,
+  spoken: lines.every((l) => l.kind === 'spoken'),
+}));
+---
+<section class="pad lyrics-block">
+  <h2 class="h2 split" style="margin-bottom:45px">Letra</h2>
+  {stanzas.length ? (
+    <div class={`lyrics-wrap ${song.decor ? 'has-decor' : ''}`}>
+      <div class="lyrics">
+        {stanzas.map((st) => (
+          <p class={`stanza ${st.chorus ? 'chorus' : ''} ${st.spoken ? 'spoken' : ''}`}>
+            {st.chorus && <span class="stanza-tag cap">Estribillo</span>}
+            {st.spoken && <span class="stanza-tag cap">Hablado</span>}
+            {st.lines.map((l) => <span class={`lyric ${l.kind === 'hl' ? 'hl' : ''}`}>{l.text}</span>)}
+          </p>
+        ))}
+      </div>
+
+      {song.decor === 'heart' && (
+        <div class="decor" aria-hidden="true">
+          <div class="decor-sticky">
+            <!-- Pixel heart that cracks in two as the lyrics scroll by -->
+            <svg class="heart" viewBox="0 0 26 24" shape-rendering="crispEdges">
+              <g class="heart-l">
+                <path fill="#ef3b2c" stroke="#333" stroke-width="1" d="M4 2h5v1h2v2h2v4h-1v2h1v2h-1v3h1v2h-1v2h-1v1h-1v1h-1v-1H8v-1H7v-1H6v-1H5v-1H4v-1H3v-1H2v-2H1V5h1V3h2z" />
+                <path fill="#fff" d="M4 5h2v2H4zM6 4h2v1H6z" />
+              </g>
+              <g class="heart-r">
+                <path fill="#ef3b2c" stroke="#333" stroke-width="1" d="M17 2h5v1h2v2h1v8h-1v2h-1v1h-1v1h-1v1h-1v1h-1v1h-1v1h-1v1h-1v-2h-1v-2h1v-3h-1v-2h1v-2h-1V5h2V3h2z" />
+              </g>
+            </svg>
+            <!-- Cupid's arrow -->
+            <svg class="arrow" viewBox="0 0 120 24">
+              <path d="M2 12h96" stroke="#333" stroke-width="3" stroke-linecap="round" />
+              <path d="M96 4l20 8-20 8 5-8z" fill="#ef3b2c" stroke="#333" stroke-width="2" stroke-linejoin="round" />
+              <path d="M2 12l10-8M2 12l10 8M10 12l10-8M10 12l10 8" stroke="#ef3b2c" stroke-width="3" stroke-linecap="round" />
+            </svg>
+            <span class="decor-label cap">14 · 02</span>
+          </div>
+          <div class="falling">
+            {Array.from({ length: 10 }, (_, i) => (
+              <svg class="mini-heart" viewBox="0 0 7 6" style={`--x:${(i * 37) % 100}%;--d:${6 + (i % 4) * 1.5}s;--delay:${-i * 1.3}s;--s:${0.6 + (i % 3) * 0.3}`} shape-rendering="crispEdges">
+                <path fill="#ef3b2c" d="M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z" />
+              </svg>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  ) : (
+    <p class="lyrics-soon reveal">La letra de «{song.t}» llegará pronto. ¿La quieres ya? Escríbele a <a href={`mailto:${email}`}>{email}</a>.</p>
+  )}
+</section>

@@ -89,6 +89,25 @@ function initPage() {
     $$('.lyric.hl').forEach((el) =>
       gsap.fromTo(el, { scale: .6, rotation: -6, xPercent: -10, opacity: 0 }, { scale: 1, rotation: -2, xPercent: 0, opacity: 1, ease: 'back.out(2)', duration: 1, scrollTrigger: { trigger: el, start: 'top 80%' } }));
 
+    // San Valentín decor: the heart cracks apart as you read, and Cupid's
+    // arrow flies in, pierces it and wobbles.
+    const decor = document.querySelector<HTMLElement>('.decor');
+    if (decor) {
+      const lyrics = decor.parentElement!.querySelector('.lyrics')!;
+      decor.style.setProperty('--h', `${lyrics.getBoundingClientRect().height + 100}px`);
+      gsap.timeline({ scrollTrigger: { trigger: lyrics, start: 'top 60%', end: 'bottom 60%', scrub: 1 } })
+        .fromTo('.heart', { scale: .7, rotation: -8 }, { scale: 1, rotation: 0, ease: 'none', duration: 1 })
+        .to('.heart-l', { rotation: -14, x: -2.5, y: 1, ease: 'none', duration: 2 })
+        .to('.heart-r', { rotation: 14, x: 2.5, y: 1, ease: 'none', duration: 2 }, '<')
+        .to('.heart', { y: 30, ease: 'none', duration: 1 });
+      gsap.timeline({ scrollTrigger: { trigger: lyrics, start: 'top 70%' } })
+        .fromTo('.arrow', { x: -500, rotation: -20, opacity: 0 }, { x: 0, rotation: -12, opacity: 1, duration: .9, ease: 'expo.out' })
+        .to('.arrow', { rotation: -8, duration: .08, repeat: 7, yoyo: true, ease: 'sine.inOut' })
+        .to('.arrow', { rotation: -12, duration: .2 });
+      // Heartbeat on the halves so it doesn't fight the scrubbed .heart tween.
+      gsap.to('.heart-l, .heart-r', { scale: 1.06, duration: .45, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+    }
+
     $$('[data-count]').forEach((el) => {
       const o = { v: 0 };
       gsap.to(o, { v: +el.dataset.count!, duration: 1.6, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%' }, onUpdate: () => (el.textContent = String(Math.round(o.v))) });

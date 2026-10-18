@@ -1,0 +1,37 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Cloud from '../../components/Cloud.astro';
+import SongDisc from '../../components/SongDisc.astro';
+import { songs, spotify, spotifyId, fmtDate } from '../../data';
+---
+<Layout title="Música" description="Todos los singles de Markho en Spotify.">
+  <section class="pad page-head scene" style="min-height:auto">
+    <Cloud style="top:22%;right:6%" speed={0.8} />
+    <h1 class="h1 split">Música</h1>
+    <p class="reveal">{songs.length} singles en Spotify. Toca un disco para escucharlo aquí mismo.</p>
+  </section>
+  <section class="pad">
+    <div class="discs">
+      {songs.map((s, i) => <SongDisc song={s} index={i} />)}
+    </div>
+    <ol class="tracklist reveal">
+      {songs.map((s, i) => (
+        <li>
+          <a href={`/musica/${s.slug}`}>
+            <span class="cap">{String(i + 1).padStart(2, '0')}</span>
+            <span class="t">{s.t}{s.explicit && <span class="e" title="Explícito">E</span>}</span>
+            <span class="cap">{fmtDate(s.date)}</span>
+            <span class="cap">{s.dur}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </section>
+  <section class="pad embed-block">
+    <h2 class="h2 split">Escúchalo todo</h2>
+    <div class="embed reveal">
+      <iframe src={`https://open.spotify.com/embed/artist/${spotifyId}?theme=0`} title="Markho en Spotify" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    </div>
+    <p style="padding:45px 0 10vh"><a class="btn" href={spotify} target="_blank" rel="noopener">Abrir en Spotify ↗</a></p>
+  </section>
+</Layout>

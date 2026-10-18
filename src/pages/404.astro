@@ -1,0 +1,12 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Cloud from '../components/Cloud.astro';
+---
+<Layout title="No encontrado">
+  <section class="pad page-head scene" style="min-height:80svh">
+    <Cloud style="top:20%;right:8%" speed={0.8} />
+    <h1 class="h1 split">404. Esta página se fue de noche.</h1>
+    <p class="reveal">Lo que buscas no está aquí, pero la música sí.</p>
+    <div class="actions reveal"><a class="btn" href="/">Volver al inicio</a><a class="btn ghost" href="/musica">Escuchar música</a></div>
+  </section>
+</Layout>

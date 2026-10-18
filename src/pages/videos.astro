@@ -1,24 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Cloud from '../components/Cloud.astro';
-import { songs, thumb, youtube } from '../data';
+import { videos, thumb, youtube } from '../data';
 ---
-<Layout title="Vídeos">
+<Layout title="Vídeos" description="Videoclips y visualizers de Markho.">
   <section class="pad page-head scene" style="min-height:auto">
     <Cloud style="top:18%;right:10%" speed={1.1} />
     <h1 class="h1 split">Vídeos</h1>
-    <p class="reveal">Videoclips y visualizers del canal.</p>
+    <p class="reveal">Videoclips y visualizers del canal de YouTube.</p>
   </section>
   <section class="pad videos">
-    {songs.map((s, i) => (
+    {videos.map((v, i) => (
       <article class="video reveal">
-        <button type="button" class="video-media" data-play={s.id} data-title={s.t} aria-label={`Reproducir ${s.t}`}>
-          <img src={thumb(s.id)} alt="" width="1280" height="720" loading={i ? 'lazy' : 'eager'} />
+        <button type="button" class="video-media" data-play={`youtube:${v.id}`} data-title={v.t} aria-label={`Reproducir ${v.t}`}>
+          <img src={thumb(v.id)} alt="" width="1280" height="720" loading={i ? 'lazy' : 'eager'} />
           <span class="disc-play" aria-hidden="true">▶</span>
         </button>
         <div class="video-info">
-          <span class="cap">{s.k} · {s.y} · {s.dur}</span>
-          <h2 class="h2">{s.t}</h2>
+          <span class="cap">{v.k} · {v.y} · {v.dur}</span>
+          <h2 class="h2">{v.t}</h2>
         </div>
       </article>
     ))}

@@ -45,8 +45,11 @@ function heroIn() {
 function initPage() {
   // The nav persists across pages, so its active link is updated here.
   const path = location.pathname.replace(/\/$/, '') || '/';
-  $$<HTMLAnchorElement>('nav.top a').forEach((a) =>
-    a.getAttribute('href') === path ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+  $$<HTMLAnchorElement>('nav.top a').forEach((a) => {
+    const href = a.getAttribute('href')!;
+    const on = href === '/' ? path === '/' : path.startsWith(href);
+    on ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current');
+  });
   ctx?.revert();
   ctx = gsap.context(() => {
     $$('.split').forEach(splitWords);
@@ -182,7 +185,14 @@ document.addEventListener('click', (e) => {
   const btn = (e.target as Element).closest<HTMLElement>('[data-play]');
   if (!btn) return;
   player.querySelector('.player-title')!.textContent = btn.dataset.title || '';
-  frame.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${btn.dataset.play}?autoplay=1&rel=0" title="${btn.dataset.title || 'YouTube'}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+  // data-play is "spotify:<trackId>" or "youtube:<videoId>".
+  const [kind, id] = btn.dataset.play!.split(':');
+  const spotify = kind === 'spotify';
+  player.classList.toggle('is-spotify', spotify);
+  const src = spotify
+    ? `https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=0`
+    : `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+  frame.innerHTML = `<iframe src="${src}" title="${btn.dataset.title || 'Reproductor'}" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
   player.showModal();
   gsap.fromTo(player, { scale: .6, rotation: -6, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: .7, ease: 'back.out(1.7)' });
 });

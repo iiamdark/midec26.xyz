@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Cloud from '../components/Cloud.astro';
 import SongDisc from '../components/SongDisc.astro';
-import { artist, formerly, songs, tagline, thumb } from '../data';
+import { artist, formerly, songs, tagline, cover, fmtDate, spotify } from '../data';
 const latest = songs[0];
 ---
 <Layout>
@@ -13,7 +13,7 @@ const latest = songs[0];
     <div class="hero-top">
       <img class="face hero-in" src="/img/markho.jpg" alt={`Foto de ${artist}`} width="900" height="900" />
       <span class="badge cap hero-in">{tagline}</span>
-      <button type="button" class="btn hero-in" data-play={latest.id} data-title={latest.t}>▶ Escuchar «{latest.t}»</button>
+      <button type="button" class="btn hero-in" data-play={`spotify:${latest.spotify}`} data-title={latest.t}>▶ Escuchar «{latest.t}»</button>
     </div>
     <div class="globe" data-globe></div>
     <svg class="globe-text" viewBox="0 0 1000 500" aria-label={artist}>
@@ -33,23 +33,28 @@ const latest = songs[0];
       <span class="split">Antes</span> <span class="strike" data-strike>{formerly}.</span><br />
       <span class="split">Ahora {artist}.</span>
     </h2>
-    <p class="sub reveal" style="max-width:560px;margin-top:45px">Artista emergente español que está empezando a hacer canciones. Música urbana, visuales propios y muchas ganas.</p>
+    <p class="sub reveal" style="max-width:560px;margin-top:45px">Artista emergente español que está empezando a hacer canciones. Música urbana, visuales propios y {songs.length} singles ya en Spotify.</p>
   </section>
 
   <section class="pad feature">
-    <button type="button" class="feature-media pop" data-play={latest.id} data-title={latest.t} aria-label={`Reproducir ${latest.t}`}>
-      <img src={thumb(latest.id)} alt="" width="1280" height="720" loading="lazy" />
-      <span class="disc-play" aria-hidden="true">▶</span>
-    </button>
+    <a href={`/musica/${latest.slug}`} class="feature-media square pop" aria-label={`Ver ${latest.t}`}>
+      <img src={cover(latest)} alt={`Portada de ${latest.t}`} width="640" height="640" loading="lazy" />
+    </a>
     <div>
-      <span class="badge cap reveal">Último lanzamiento</span>
+      <span class="badge cap reveal">Último single · {fmtDate(latest.date)}</span>
       <h2 class="h1 split" style="margin-top:20px">{latest.t}</h2>
-      <p class="sub reveal" style="margin-top:20px">{latest.k} · {latest.y} · {latest.dur}</p>
+      <div class="actions reveal">
+        <button type="button" class="btn" data-play={`spotify:${latest.spotify}`} data-title={latest.t}>▶ Spotify</button>
+        {latest.youtube && <button type="button" class="btn ghost" data-play={`youtube:${latest.youtube}`} data-title={latest.t}>▶ Visualizer</button>}
+      </div>
     </div>
   </section>
 
   <section class="pad">
-    <h2 class="h2 split" style="margin-bottom:45px">Canciones</h2>
+    <div class="head-row">
+      <h2 class="h2 split">Singles</h2>
+      <a class="btn ghost reveal" href={spotify} target="_blank" rel="noopener">Seguir en Spotify ↗</a>
+    </div>
     <div class="discs">
       {songs.slice(1).map((s) => <SongDisc song={s} />)}
     </div>

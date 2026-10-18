@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Cloud from '../components/Cloud.astro';
+import { reels, reelThumb, reelUrl, fmtDate, instagram, instagramUser, artist } from '../data';
+---
+<Layout title="Clips" description={`Reels y clips cortos de ${artist} en Instagram (@${instagramUser}).`}>
+  <section class="pad page-head scene" style="min-height:auto">
+    <Cloud style="top:18%;right:8%" speed={0.9} />
+    <h1 class="h1 split">Clips</h1>
+    <p class="reveal">Adelantos, freestyles y el día a día. Los reels de @{instagramUser}, aquí mismo.</p>
+  </section>
+  <section class="pad">
+    <div class="reels">
+      {reels.map((r, i) => (
+        <button type="button" class="reel pop" data-play={`instagram:${r.id}`} data-title={`Reel · ${fmtDate(r.date)}`} aria-label={`Ver reel del ${fmtDate(r.date)}`}>
+          <img src={reelThumb(r)} alt="" width="360" height="640" loading={i < 4 ? 'eager' : 'lazy'} />
+          <span class="disc-play" aria-hidden="true">▶</span>
+          <span class="reel-date cap">{fmtDate(r.date)}</span>
+        </button>
+      ))}
+    </div>
+    <p class="actions" style="padding:20px 0 10vh">
+      <a class="btn" href={instagram} target="_blank" rel="noopener">Seguir en Instagram ↗</a>
+      <a class="btn ghost" href={reelUrl(reels[0])} target="_blank" rel="noopener">Último reel ↗</a>
+    </p>
+  </section>
+</Layout>

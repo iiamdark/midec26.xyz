@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Cloud from '../components/Cloud.astro';
+import Collabs from '../components/Collabs.astro';
 import { videos, thumb, youtube } from '../data';
 ---
 <Layout title="Vídeos" description="Videoclips y visualizers de Markho.">
@@ -22,6 +23,9 @@ import { videos, thumb, youtube } from '../data';
         </div>
       </article>
     ))}
+  </section>
+  <Collabs />
+  <section class="pad">
     <p style="padding:20px 0 10vh"><a class="btn" href={youtube} target="_blank" rel="noopener">Suscríbete en YouTube ↗</a></p>
   </section>
 </Layout>

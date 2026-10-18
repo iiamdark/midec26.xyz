@@ -1,0 +1,21 @@
+---
+import { collabs, thumb, fmtDate } from '../data';
+---
+<section class="pad collabs">
+  <h2 class="h2 split" style="margin-bottom:45px">Colaboraciones</h2>
+  {collabs.map((c) => (
+    <article class="video reveal">
+      <button type="button" class="video-media" data-play={`youtube:${c.youtube}`} data-title={`${c.artists} — ${c.t}`} aria-label={`Reproducir ${c.t}`}>
+        <img src={thumb(c.youtube)} alt="" width="1280" height="720" loading="lazy" />
+        <span class="disc-play" aria-hidden="true">▶</span>
+      </button>
+      <div class="video-info">
+        <span class="badge cap">Feat. con {c.with.name}</span>
+        <h3 class="h2" style="margin-top:14px">{c.t}</h3>
+        <p class="sub" style="margin-top:14px">{c.artists}{c.project && ` · ${c.project}`}</p>
+        <p class="cap" style="margin-top:6px">{c.k} · {fmtDate(c.date)} · {c.dur}</p>
+        <div class="actions"><a class="btn ghost" href={c.with.href} target="_blank" rel="noopener">Canal de {c.with.name} ↗</a></div>
+      </div>
+    </article>
+  ))}
+</section>

@@ -185,13 +185,15 @@ document.addEventListener('click', (e) => {
   const btn = (e.target as Element).closest<HTMLElement>('[data-play]');
   if (!btn) return;
   player.querySelector('.player-title')!.textContent = btn.dataset.title || '';
-  // data-play is "spotify:<trackId>" or "youtube:<videoId>".
+  // data-play is "spotify:<trackId>", "youtube:<videoId>" or "instagram:<reelId>".
   const [kind, id] = btn.dataset.play!.split(':');
-  const spotify = kind === 'spotify';
-  player.classList.toggle('is-spotify', spotify);
-  const src = spotify
-    ? `https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=0`
-    : `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+  player.classList.toggle('is-spotify', kind === 'spotify');
+  player.classList.toggle('is-vertical', kind === 'instagram');
+  const src = {
+    spotify: `https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=0`,
+    instagram: `https://www.instagram.com/reel/${id}/embed/`,
+    youtube: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`,
+  }[kind] ?? '';
   frame.innerHTML = `<iframe src="${src}" title="${btn.dataset.title || 'Reproductor'}" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
   player.showModal();
   gsap.fromTo(player, { scale: .6, rotation: -6, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: .7, ease: 'back.out(1.7)' });

@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Cloud from '../../components/Cloud.astro';
 import SongDisc from '../../components/SongDisc.astro';
+import Collabs from '../../components/Collabs.astro';
 import { songs, spotify, spotifyId, fmtDate } from '../../data';
 ---
 <Layout title="Música" description="Todos los singles de Markho en Spotify.">
@@ -27,6 +28,7 @@ import { songs, spotify, spotifyId, fmtDate } from '../../data';
       ))}
     </ol>
   </section>
+  <Collabs />
   <section class="pad embed-block">
     <h2 class="h2 split">Escúchalo todo</h2>
     <div class="embed reveal">

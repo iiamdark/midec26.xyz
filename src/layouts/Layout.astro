@@ -3,7 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 import '@fontsource/changa-one';
 import '../styles/global.css';
 import Intro from '../components/Intro.astro';
-import { artist, formerly, nav, socials, email, songs, spotify, youtube, instagram, trackUrl, site } from '../data';
+import { artist, formerly, nav, socials, email, songs, spotify, youtube, instagram, trackUrl, site, appleMusic, label } from '../data';
 
 interface Props { title?: string; description?: string; image?: string }
 const {
@@ -24,7 +24,8 @@ const jsonLd = {
   url: site,
   image: new URL('/img/markho.jpg', site).href,
   email,
-  sameAs: [spotify, youtube, instagram],
+  sameAs: [spotify, appleMusic, youtube, instagram],
+  recordLabel: label,
   track: songs.map((s) => ({ '@type': 'MusicRecording', name: s.t, url: trackUrl(s), datePublished: s.date })),
 };
 ---
@@ -53,6 +54,7 @@ const jsonLd = {
     <link rel="icon" href="/favicon.svg" />
     <script is:inline>
       document.documentElement.classList.add('intro-on');
+      try { if (localStorage.getItem('theme') === 'night') document.documentElement.dataset.theme = 'night'; } catch (e) {}
     </script>
     <ClientRouter />
   </head>
@@ -62,6 +64,9 @@ const jsonLd = {
       <ul>
         {nav.map((n) => <li><a href={n.href} aria-current={(n.href === '/' ? path === '/' : path.startsWith(n.href)) ? 'page' : undefined}>{n.label}</a></li>)}
       </ul>
+      <button type="button" class="theme-toggle" aria-label="Modo noche" aria-pressed="false" title="Modo noche">
+        <svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path class="moon" d="M6 2h4v1h2v1h1v2h-3V5H8v1H7v4h1v1h2v-1h3v2h-1v1h-2v1H6v-1H4v-1H3v-2H2V6h1V4h1V3h2z"/><path class="sun" d="M7 1h2v2H7zM7 13h2v2H7zM1 7h2v2H1zM13 7h2v2h-2zM3 3h2v2H3zM11 3h2v2h-2zM3 11h2v2H3zM11 11h2v2h-2zM6 5h4v1h1v4h-1v1H6v-1H5V6h1z"/></svg>
+      </button>
     </nav>
 
     <main><slot /></main>

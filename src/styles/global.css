@@ -5,6 +5,15 @@
   --ease: cubic-bezier(.7, 0, .2, 1);
   --line: 4px solid var(--ink);
 }
+/* Night mode: dark red, after the "otra noche mala" cover. The colour
+   tokens keep their names but take night values. */
+:root[data-theme='night'] {
+  --yellow: #1c0505; --ink: #ffd6cf; --white: #2e0a09; --blue: #a3141b; --coral: #ff3b2f;
+  color-scheme: dark;
+}
+:root[data-theme='night'] .globe-text text { fill: #1c0505; stroke: #ff3b2f; }
+:root[data-theme='night'] .marquee .track span::after { color: #ff3b2f; }
+:root[data-theme='night'] dialog.player::backdrop { background: rgba(0, 0, 0, .85); }
 *, *::before, *::after { box-sizing: border-box; margin: 0; }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
@@ -17,7 +26,7 @@ img { display: block; max-width: 100%; height: auto; }
 h1, h2, h3, .d { font-family: var(--display); font-weight: 400; }
 .h1 { font-size: clamp(50px, 8vw, 120px); line-height: .85; }
 .h2 { font-size: clamp(36px, 5vw, 75px); line-height: .85; }
-.h3 { font-size: clamp(24px, 2.4vw, 32px); line-height: 1; }
+.h3 { font-family: var(--display); font-size: clamp(24px, 2.4vw, 32px); line-height: 1; }
 .sub { font-family: var(--display); font-size: clamp(18px, 1.6vw, 22px); line-height: 1.25; }
 .cap { font-family: var(--display); font-size: 13px; line-height: 1.5; text-transform: uppercase; letter-spacing: .05em; }
 .pad { padding-inline: clamp(20px, 4vw, 45px); }
@@ -39,6 +48,13 @@ h1, h2, h3, .d { font-family: var(--display); font-weight: 400; }
 nav.top { position: fixed; inset: 0 0 auto; z-index: 50; display: flex; justify-content: center; padding: 10px 0; transition: transform .6s var(--ease), background .3s, border-color .3s; border-bottom: 3px solid transparent; }
 nav.top.solid { background: var(--yellow); border-color: var(--ink); }
 nav.top.hide { transform: translateY(-110%); }
+nav.top { align-items: center; gap: 6px; }
+.theme-toggle { width: 40px; height: 40px; display: grid; place-items: center; border: 3px solid var(--ink); background: var(--yellow); transition: transform .5s var(--ease), background .3s; }
+.theme-toggle:hover { transform: rotate(-12deg) scale(1.08); }
+.theme-toggle svg { width: 20px; height: 20px; fill: var(--ink); }
+.theme-toggle .sun, [data-theme='night'] .theme-toggle .moon { display: none; }
+[data-theme='night'] .theme-toggle .sun { display: block; }
+@media (max-width: 560px) { .theme-toggle { width: 34px; height: 34px; } }
 nav.top ul { display: flex; list-style: none; padding: 0; flex-wrap: wrap; justify-content: center; }
 nav.top a { display: block; padding: 10px 20px; text-transform: uppercase; font-size: 14px; font-weight: 700; letter-spacing: .04em; position: relative; }
 nav.top a::after { content: ''; position: absolute; left: 50%; bottom: 4px; width: 20px; height: 3px; margin-left: -10px; background: var(--ink); transform: scaleX(0); transition: transform .4s var(--ease); }
@@ -128,6 +144,27 @@ button:hover .disc-play { transform: scale(1.15); background: var(--white); }
 .prevnext a:hover { background: var(--ink); color: var(--yellow); transform: rotate(-2deg); }
 @media (max-width: 700px) { .song-hero { grid-template-columns: 1fr; } .song-cover { max-width: 320px; margin-inline: auto; } .prevnext { grid-template-columns: 1fr; } }
 
+/* platforms */
+.platforms { display: flex; flex-wrap: wrap; gap: 10px 20px; list-style: none; padding: 0; margin-top: 24px; text-transform: uppercase; font-weight: 700; font-size: 14px; }
+.platforms a { border-bottom: 2px solid var(--ink); }
+.platforms a:hover { color: var(--blue); border-color: var(--blue); }
+
+/* lyrics */
+.lyrics-block { padding-block: 10vh 5vh; }
+.lyrics { max-width: 900px; display: grid; gap: 45px; }
+.stanza { display: grid; gap: 4px; }
+.lyric { display: block; font-family: var(--display); font-size: clamp(22px, 2.6vw, 34px); line-height: 1.15; opacity: .35; transition: opacity .4s; }
+.lyric.on { opacity: 1; }
+.lyric.hl { font-size: clamp(36px, 6vw, 80px); line-height: .9; margin-block: 14px; opacity: 1; color: var(--coral); -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; transform-origin: left center; }
+.lyrics-soon { max-width: 640px; padding: 30px; border: var(--line); background: var(--white); font-family: var(--display); font-size: clamp(20px, 2vw, 26px); line-height: 1.25; transform: rotate(-1deg); }
+.lyrics-soon a { border-bottom: 3px solid var(--ink); }
+
+/* credits */
+.credits-block { padding-block: 5vh; }
+.credits { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); border-top: var(--line); border-left: var(--line); }
+.credits div { padding: 20px; border-right: var(--line); border-bottom: var(--line); background: var(--white); }
+.credits dd { font-family: var(--display); font-size: clamp(22px, 2.4vw, 32px); line-height: 1; margin-top: 6px; }
+
 /* reels */
 .reels { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
 .reel { position: relative; display: block; aspect-ratio: 9/16; border: var(--line); overflow: hidden; background: var(--ink); transition: transform .5s var(--ease); }
@@ -211,6 +248,7 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
 /* page transitions */
 ::view-transition-old(root) { animation: none; }
 ::view-transition-new(root) { animation: circle-in .9s var(--ease); }
+.theme-switching::view-transition-new(root) { animation: none; }
 @keyframes circle-in { from { clip-path: circle(0% at 50% 110%); } to { clip-path: circle(150% at 50% 110%); } }
 
 @media (prefers-reduced-motion: reduce) {

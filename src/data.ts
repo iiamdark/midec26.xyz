@@ -16,22 +16,29 @@ export const nav = [
 export const spotifyId = '62PCBFxD6IB7B3DcVheIJp';
 export const spotify = `https://open.spotify.com/artist/${spotifyId}`;
 export const youtube = 'https://www.youtube.com/@MarkhoES';
+export const appleMusic = 'https://music.apple.com/es/artist/markho/1850461272';
+export const label = 'Deck Music';
 export const instagramUser = 'rial_markho';
 export const instagram = `https://www.instagram.com/${instagramUser}/`;
 export const email = 'midecubos@gmail.com';
 
 export type Color = 'blue' | 'coral' | 'white';
+export interface Credits { producer?: string; mix?: string; master?: string; cover?: string; writers?: string }
 export interface Song {
   slug: string; t: string; date: string; dur: string;
-  spotify: string; youtube?: string; explicit?: boolean; color: Color;
+  spotify: string; apple?: string; youtube?: string; explicit?: boolean; color: Color;
+  credits?: Credits;
+  // Letra: estrofas separadas por una línea en blanco. Una línea que empieza
+  // por "* " se muestra como frase destacada.
+  lyrics?: string;
 }
 // Singles en Spotify, más reciente primero.
 export const songs: Song[] = [
-  { slug: 'san-valentin', t: 'San Valentín', date: '2026-07-24', dur: '2:51', spotify: '0FDdG1ZYNEHfE83WNCAp3u', youtube: 'YGt95E2D3go', explicit: true, color: 'coral' },
-  { slug: 'otra-noche-mala', t: 'otra noche mala', date: '2026-06-05', dur: '2:50', spotify: '31nBNBk0WTlY2ImhqL0by4', color: 'blue' },
-  { slug: 'como-si-nada', t: 'como si nada', date: '2026-05-24', dur: '2:14', spotify: '5tKnfZkIQIlqz6WyEGniTE', youtube: 'BWlaL_6-JOE', color: 'white' },
-  { slug: 'ella-ella-ella', t: 'Ella Ella Ella', date: '2026-03-05', dur: '2:45', spotify: '7034S4K1kVbdCmIWaM2HfH', explicit: true, color: 'coral' },
-  { slug: 'entre-sombras-y-luces', t: 'Entre Sombras y Luces', date: '2025-10-23', dur: '2:53', spotify: '1uoUt868ZsXBUzwR2snU7x', youtube: 'okZgYt5MAJ4', explicit: true, color: 'blue' },
+  { slug: 'san-valentin', apple: 'https://music.apple.com/es/album/san-valent%C3%ADn/6792689093?i=6792689094', t: 'San Valentín', date: '2026-07-24', dur: '2:51', spotify: '0FDdG1ZYNEHfE83WNCAp3u', youtube: 'YGt95E2D3go', explicit: true, color: 'coral' },
+  { slug: 'otra-noche-mala', apple: 'https://music.apple.com/es/album/otra-noche-mala/6773278814?i=6773278815', t: 'otra noche mala', date: '2026-06-05', dur: '2:50', spotify: '31nBNBk0WTlY2ImhqL0by4', color: 'blue' },
+  { slug: 'como-si-nada', apple: 'https://music.apple.com/es/album/como-si-nada/6777631745?i=6777631746', t: 'como si nada', date: '2026-05-24', dur: '2:14', spotify: '5tKnfZkIQIlqz6WyEGniTE', youtube: 'BWlaL_6-JOE', color: 'white' },
+  { slug: 'ella-ella-ella', apple: 'https://music.apple.com/es/album/ella-ella-ella/1889116083?i=1889116084', t: 'Ella Ella Ella', date: '2026-03-05', dur: '2:45', spotify: '7034S4K1kVbdCmIWaM2HfH', explicit: true, color: 'coral' },
+  { slug: 'entre-sombras-y-luces', apple: 'https://music.apple.com/es/album/entre-sombras-y-luces/1850472087?i=1850472088', t: 'Entre Sombras y Luces', date: '2025-10-23', dur: '2:53', spotify: '1uoUt868ZsXBUzwR2snU7x', youtube: 'okZgYt5MAJ4', explicit: true, color: 'blue' },
 ];
 
 export interface Video { id: string; t: string; k: string; y: string; dur: string }
@@ -42,6 +49,11 @@ export const videos: Video[] = [
   { id: 'OWHzjMbR9uQ', t: 'Si Estuvieras Aquí', k: 'Cover', y: '2025', dur: '3:29' },
 ];
 
+export const platforms = (s: Song) => [
+  { label: 'Spotify', href: trackUrl(s) },
+  ...(s.apple ? [{ label: 'Apple Music', href: s.apple }] : []),
+  ...(s.youtube ? [{ label: 'YouTube', href: `https://www.youtube.com/watch?v=${s.youtube}` }] : []),
+];
 export const cover = (s: Song) => `/img/cover-${s.slug}.jpg`;
 export const thumb = (id: string) => `/img/${id}.jpg`;
 export const trackUrl = (s: Song) => `https://open.spotify.com/track/${s.spotify}`;
@@ -50,6 +62,7 @@ export const fmtDate = (iso: string) => { const [y, m, d] = iso.split('-'); retu
 
 export const socials = [
   { label: 'Spotify', href: spotify },
+  { label: 'Apple Music', href: appleMusic },
   { label: 'YouTube', href: youtube },
   { label: 'Instagram', href: instagram },
 ];

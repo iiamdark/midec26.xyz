@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { songs, cover, fmtDate, trackUrl, thumb, artist, type Song } from '../../data';
+import { songs, cover, fmtDate, thumb, artist, label, platforms, email, type Song } from '../../data';
 
 export function getStaticPaths() {
   return songs.map((song, i) => ({ params: { slug: song.slug }, props: { song, i } }));
@@ -8,6 +8,19 @@ export function getStaticPaths() {
 interface Props { song: Song; i: number }
 const { song, i } = Astro.props;
 const prev = songs[i - 1], next = songs[i + 1];
+const year = song.date.slice(0, 4);
+const c = song.credits ?? {};
+const credits = [
+  ['Artista', artist === 'MARKHO' ? 'Markho' : artist],
+  ['Letra', c.writers],
+  ['Producción', c.producer],
+  ['Mezcla', c.mix],
+  ['Máster', c.master],
+  ['Portada', c.cover],
+  ['Sello', `${label} · ℗ ${year}`],
+  ['Lanzamiento', fmtDate(song.date)],
+].filter(([, v]) => v) as [string, string][];
+const stanzas = song.lyrics?.trim().split(/\n\s*\n/).map((st) => st.split('\n').map((l) => l.trim()));
 ---
 <Layout title={song.t} description={`«${song.t}» de ${artist}. Single publicado el ${fmtDate(song.date)}.`} image={cover(song)}>
   <section class="pad song-hero">
@@ -18,8 +31,10 @@ const prev = songs[i - 1], next = songs[i + 1];
       <p class="sub reveal" style="margin-top:20px">Single · {fmtDate(song.date)} · {song.dur}{song.explicit && ' · Explícito'}</p>
       <div class="actions reveal">
         <button type="button" class="btn" data-play={`spotify:${song.spotify}`} data-title={song.t}>▶ Escuchar</button>
-        <a class="btn ghost" href={trackUrl(song)} target="_blank" rel="noopener">Abrir en Spotify ↗</a>
       </div>
+      <ul class="platforms reveal" aria-label="Escuchar en">
+        {platforms(song).map((p) => <li><a href={p.href} target="_blank" rel="noopener">{p.label} ↗</a></li>)}
+      </ul>
     </div>
   </section>
 
@@ -38,6 +53,30 @@ const prev = songs[i - 1], next = songs[i + 1];
       </button>
     </section>
   )}
+
+  <section class="pad lyrics-block">
+    <h2 class="h2 split" style="margin-bottom:45px">Letra</h2>
+    {stanzas ? (
+      <div class="lyrics">
+        {stanzas.map((st) => (
+          <p class="stanza">
+            {st.map((l) => l.startsWith('* ')
+              ? <span class="lyric hl">{l.slice(2)}</span>
+              : <span class="lyric">{l}</span>)}
+          </p>
+        ))}
+      </div>
+    ) : (
+      <p class="lyrics-soon reveal">La letra de «{song.t}» llegará pronto. ¿La quieres ya? Escríbele a <a href={`mailto:${email}`}>{email}</a>.</p>
+    )}
+  </section>
+
+  <section class="pad credits-block">
+    <h2 class="h2 split" style="margin-bottom:45px">Créditos</h2>
+    <dl class="credits">
+      {credits.map(([k, v]) => <div class="reveal"><dt class="cap">{k}</dt><dd>{v}</dd></div>)}
+    </dl>
+  </section>
 
   <nav class="pad prevnext" aria-label="Otros singles">
     {prev ? <a href={`/musica/${prev.slug}`} class="pop"><span class="cap">← Más nuevo</span><span class="h3">{prev.t}</span></a> : <span></span>}

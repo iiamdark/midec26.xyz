@@ -83,6 +83,12 @@ function initPage() {
       if (introDone || !document.documentElement.classList.contains('intro-on')) heroIn();
     }
 
+    // Lyrics light up line by line; highlighted lines punch in.
+    $$('.lyric:not(.hl)').forEach((el) =>
+      ScrollTrigger.create({ trigger: el, start: 'top 75%', end: 'bottom 25%', toggleClass: 'on' }));
+    $$('.lyric.hl').forEach((el) =>
+      gsap.fromTo(el, { scale: .6, rotation: -6, xPercent: -10, opacity: 0 }, { scale: 1, rotation: -2, xPercent: 0, opacity: 1, ease: 'back.out(2)', duration: 1, scrollTrigger: { trigger: el, start: 'top 80%' } }));
+
     $$('[data-count]').forEach((el) => {
       const o = { v: 0 };
       gsap.to(o, { v: +el.dataset.count!, duration: 1.6, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%' }, onUpdate: () => (el.textContent = String(Math.round(o.v))) });
@@ -174,6 +180,40 @@ function playIntro() {
   loaded.then(() => { fake.kill(); tl.play(); });
   intro.querySelector('.skip')!.addEventListener('click', () => { fake.kill(); tl.progress(1); });
 }
+
+// Night mode toggle: the new theme grows as a circle from the button.
+const themeBtn = document.querySelector<HTMLButtonElement>('.theme-toggle')!;
+const syncTheme = () => {
+  const night = document.documentElement.dataset.theme === 'night';
+  themeBtn.setAttribute('aria-pressed', String(night));
+  themeBtn.title = themeBtn.ariaLabel = night ? 'Modo día' : 'Modo noche';
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', night ? '#1c0505' : '#ffe600');
+};
+syncTheme();
+// Carry the theme onto the incoming page before it is swapped in (no flash).
+document.addEventListener('astro:before-swap', (e) => {
+  const theme = document.documentElement.dataset.theme;
+  if (theme) e.newDocument.documentElement.dataset.theme = theme;
+});
+document.addEventListener('astro:after-swap', syncTheme);
+themeBtn.addEventListener('click', () => {
+  const html = document.documentElement;
+  const apply = () => {
+    if (html.dataset.theme === 'night') delete html.dataset.theme; else html.dataset.theme = 'night';
+    try { localStorage.setItem('theme', html.dataset.theme ?? 'day'); } catch {}
+    syncTheme();
+  };
+  if (!document.startViewTransition || reduced) return apply();
+  const r = themeBtn.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  html.classList.add('theme-switching');
+  const vt = document.startViewTransition(apply);
+  vt.ready.then(() => document.documentElement.animate(
+    { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+    { duration: 700, easing: 'cubic-bezier(.7, 0, .2, 1)', pseudoElement: '::view-transition-new(root)' },
+  ));
+  vt.finished.finally(() => html.classList.remove('theme-switching'));
+});
 
 // YouTube player in a dialog; any [data-play] element opens it.
 const player = document.querySelector<HTMLDialogElement>('dialog.player')!;

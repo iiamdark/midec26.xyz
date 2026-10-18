@@ -1,0 +1,49 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '@fontsource/changa-one';
+import '../styles/global.css';
+import Intro from '../components/Intro.astro';
+import { artist, formerly, nav, socials, email } from '../data';
+
+interface Props { title?: string; description?: string }
+const { title, description = `${artist} (antes ${formerly}). Música, gira y contacto.` } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title ? `${title} — ${artist}` : `${artist} — Sitio oficial`}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ffe600" />
+    <link rel="icon" href="/favicon.svg" />
+    <script is:inline>
+      try { if (!sessionStorage.getItem('intro')) document.documentElement.classList.add('intro-on'); } catch (e) {}
+    </script>
+    <ClientRouter />
+  </head>
+  <body>
+    <Intro />
+    <nav class="top" transition:persist>
+      <ul>
+        {nav.map((n) => <li><a href={n.href} aria-current={path === n.href ? 'page' : undefined}>{n.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <main><slot /></main>
+
+    <footer class="pad">
+      <div class="giant" aria-hidden="true">{artist}</div>
+      <div class="row">
+        <span>© 2026 {artist} · antes {formerly}</span>
+        <ul>{socials.map((s) => <li><a href={s.href}>{s.label}</a></li>)}</ul>
+        <a href={`mailto:${email}`}>{email}</a>
+      </div>
+    </footer>
+
+    <script>
+      import '../scripts/app.ts';
+    </script>
+  </body>
+</html>

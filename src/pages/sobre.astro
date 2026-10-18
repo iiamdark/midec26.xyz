@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { artist, formerly } from '../data';
+---
+<Layout title="Sobre">
+  <section class="pad page-head">
+    <h1 class="h1 split">Sobre {artist}</h1>
+  </section>
+  <section class="pad about">
+    <div>
+      <p class="reveal">{artist} es el proyecto que antes conocías como {formerly}.</p>
+      <p class="reveal">Paisajes sonoros entre lo electrónico y lo íntimo, hechos de noche y en solitario.</p>
+      <p class="reveal">El cambio de nombre no borra nada: cada canción de {formerly} sigue aquí, y cada disco nuevo es otra noche distinta.</p>
+    </div>
+    <div class="orb pop"><canvas id="globe-gl" aria-hidden="true"></canvas></div>
+  </section>
+</Layout>

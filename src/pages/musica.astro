@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Cloud from '../components/Cloud.astro';
+import { releases } from '../data';
+---
+<Layout title="Música">
+  <section class="pad page-head scene" style="min-height:auto">
+    <Cloud style="top:22%;right:6%" speed={0.8} />
+    <h1 class="h1 split">Música</h1>
+    <p class="reveal">Discos, EPs y sencillos. Pasa el cursor por un disco para darle vuelta.</p>
+  </section>
+  <section class="pad">
+    <div class="discs">
+      {releases.map((r) => (
+        <a class={`disc pop ${r.color}`} href="#">
+          <span class="h2">{r.t}</span>
+          <span class="cap">{r.k} · {r.y} · {r.tracks} {r.tracks === 1 ? 'tema' : 'temas'}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>

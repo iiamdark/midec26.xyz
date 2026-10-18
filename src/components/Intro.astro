@@ -1,0 +1,46 @@
+---
+// Intro: a hero mask (web pattern, angular lenses). The left lens zooms in and
+// becomes the window through which the site is revealed.
+const C = { x: 50, y: 50 };
+const spokes = Array.from({ length: 16 }, (_, i) => {
+  const a = (i / 16) * Math.PI * 2;
+  return `M${C.x} ${C.y} L${C.x + Math.cos(a) * 120} ${C.y + Math.sin(a) * 120}`;
+});
+// concentric webs: polygons with slight inward sag between spokes
+const rings = [8, 16, 26, 38, 52, 68, 86].map((r) => {
+  let d = '';
+  for (let i = 0; i <= 16; i++) {
+    const a = (i / 16) * Math.PI * 2, b = ((i - 0.5) / 16) * Math.PI * 2;
+    const x = C.x + Math.cos(a) * r, y = C.y + Math.sin(a) * r;
+    const cx = C.x + Math.cos(b) * r * 0.86, cy = C.y + Math.sin(b) * r * 0.86;
+    d += i === 0 ? `M${x} ${y}` : ` Q${cx} ${cy} ${x} ${y}`;
+  }
+  return d;
+});
+const L = 'M20 41 Q31 32 45 45 Q42 56 34 57 Q23 56 20 41 Z';
+const R = 'M80 41 Q69 32 55 45 Q58 56 66 57 Q77 56 80 41 Z';
+---
+<div class="intro" aria-hidden="true" transition:persist>
+  <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <mask id="intro-mask" maskUnits="userSpaceOnUse" x="-500" y="-500" width="1100" height="1100">
+        <rect x="-500" y="-500" width="1100" height="1100" fill="#fff" />
+        <g class="eyes-hole"><path d={L} fill="#000" /><path d={R} fill="#000" /></g>
+      </mask>
+    </defs>
+    <g mask="url(#intro-mask)">
+      <rect x="-500" y="-500" width="1100" height="1100" fill="#ef3b2c" />
+      <g class="web" fill="none" stroke="#333" stroke-width=".35" stroke-linecap="round">
+        {spokes.map((d) => <path d={d} pathLength="1" />)}
+        {rings.map((d) => <path d={d} pathLength="1" />)}
+      </g>
+      <g class="eyes-frame" fill="none" stroke="#333" stroke-width="2.2" stroke-linejoin="round">
+        <path d={L} /><path d={R} />
+      </g>
+      <g class="eyes-lens" fill="#fff">
+        <path d={L} /><path d={R} />
+      </g>
+    </g>
+  </svg>
+  <button class="skip cap" type="button">Saltar intro</button>
+</div>

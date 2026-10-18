@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Cloud from '../components/Cloud.astro';
+import { email, socials } from '../data';
+---
+<Layout title="Contacto">
+  <section class="pad page-head scene" style="min-height:auto">
+    <Cloud style="top:16%;right:8%" speed={0.7} />
+    <h1 class="h1 split">Hablemos</h1>
+    <p class="reveal">Booking, prensa y colaboraciones.</p>
+  </section>
+  <section class="pad" style="padding-bottom:10vh">
+    <a class="big-link reveal" href={`mailto:${email}`}>{email}</a>
+    <div class="next">
+      {socials.map((s) => <a class="pop" href={s.href}>{s.label}</a>)}
+    </div>
+    <h2 class="h2 split">Newsletter</h2>
+    <form class="news reveal">
+      <input type="email" required placeholder="tu@correo.com" aria-label="Correo electrónico" />
+      <button type="submit">Suscribirme</button>
+    </form>
+  </section>
+</Layout>

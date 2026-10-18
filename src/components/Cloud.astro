@@ -1,0 +1,7 @@
+---
+interface Props { style?: string; speed?: number }
+const { style, speed = 1 } = Astro.props;
+---
+<svg class="cloud" style={style} data-speed={speed} viewBox="0 0 200 100" aria-hidden="true">
+  <path d="M30 80 Q8 80 10 62 Q12 46 32 48 Q30 24 56 22 Q76 20 84 36 Q96 14 124 20 Q150 26 148 50 Q172 44 182 60 Q192 80 168 82 Z" />
+</svg>

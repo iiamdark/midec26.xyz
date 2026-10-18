@@ -66,8 +66,60 @@ const stanzas = blocks.map((lines) => ({
           </div>
         </div>
       )}
+
+      {song.decor === 'phone' && (
+        <div class="decor" aria-hidden="true">
+          <div class="decor-sticky">
+            <span class="decor-label cap">📍 Centro de Madrid</span>
+            <!-- Phone whose wallpaper is still him; gets blocked, then rings -->
+            <div class="phone">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <img src="/img/markho.jpg" alt="" width="900" height="900" loading="lazy" />
+                <span class="ph-time">00:14</span>
+                <span class="ph-notif ph-blocked cap">🚫 Te ha bloqueado</span>
+                <span class="ph-notif ph-wall cap">Fondo de pantalla guardado</span>
+                <div class="ph-call">
+                  <span class="cap">Llamada entrante</span>
+                  <b>mami 📞</b>
+                  <svg class="ph-rings" viewBox="0 0 60 60"><circle cx="30" cy="30" r="12" /><circle cx="30" cy="30" r="20" /><circle cx="30" cy="30" r="28" /></svg>
+                </div>
+              </div>
+            </div>
+            <span class="decor-label cap">Día <b class="ph-days">1</b> sin ti</span>
+          </div>
+        </div>
+      )}
+
+      {song.decor === 'light' && (
+        <div class="decor" aria-hidden="true">
+          <div class="decor-sticky">
+            <!-- Disco ball with sweeping beams, and the fire they played with -->
+            <svg class="disco" viewBox="0 0 120 150">
+              <path d="M60 0v22" stroke="currentColor" stroke-width="2" />
+              <g class="beams">
+                <path d="M60 50 L-40 150 L0 150Z" /><path d="M60 50 L40 150 L80 150Z" /><path d="M60 50 L120 150 L160 150Z" />
+              </g>
+              <g class="ball">
+                <circle cx="60" cy="50" r="28" fill="#c9c9c9" stroke="#333" stroke-width="2" />
+                <path d="M32 50h56M36 36h48M36 64h48M44 26h32M44 74h32M60 22v56M46 24v52M74 24v52" stroke="#333" stroke-width="1" />
+                <rect class="spark" x="44" y="34" width="6" height="6" fill="#fff" />
+                <rect class="spark" x="66" y="56" width="5" height="5" fill="#fff" />
+              </g>
+            </svg>
+            <svg class="flame" viewBox="0 0 40 52" shape-rendering="crispEdges">
+              <g class="flame-in">
+                <path fill="#ef3b2c" stroke="#333" stroke-width="1.5" d="M18 2h4v6h4v6h4v8h4v14h-2v6h-4v4h-4v4H16v-4h-4v-4H8v-6H6V24h4v-8h4V8h4z" />
+                <path fill="#ffe600" d="M18 22h4v6h4v10h-4v4h-4v-4h-4V28h4z" />
+              </g>
+            </svg>
+            <span class="decor-label cap">🌙 La luna, notario</span>
+          </div>
+        </div>
+      )}
     </div>
-  ) : (
+  ) : null}
+  {!stanzas.length && (
     <p class="lyrics-soon reveal">La letra de «{song.t}» llegará pronto. ¿La quieres ya? Escríbele a <a href={`mailto:${email}`}>{email}</a>.</p>
   )}
 </section>

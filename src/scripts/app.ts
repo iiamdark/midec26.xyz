@@ -92,7 +92,29 @@ function initPage() {
     // San Valentín decor: the heart cracks apart as you read, and Cupid's
     // arrow flies in, pierces it and wobbles.
     const decor = document.querySelector<HTMLElement>('.decor');
-    if (decor) {
+    const lyricsEl = decor?.parentElement!.querySelector('.lyrics');
+
+    // como si nada: the days without her tick up, she blocks him, his photo
+    // is still her wallpaper, and finally the phone rings.
+    if (decor && lyricsEl && decor.querySelector('.phone')) {
+      const days = decor.querySelector('.ph-days')!;
+      const d = { v: 1 };
+      gsap.timeline({ scrollTrigger: { trigger: lyricsEl, start: 'top 60%', end: 'bottom 70%', scrub: 1 } })
+        .to(d, { v: 10, ease: 'none', duration: 4, onUpdate: () => (days.textContent = String(Math.round(d.v))) })
+        .fromTo('.ph-blocked', { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: .5 }, 1)
+        .fromTo('.ph-wall', { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: .5 }, 1.8)
+        .to('.ph-call', { yPercent: -101, duration: .6, ease: 'back.out(1.6)' }, 3.2);
+      gsap.to('.phone', { rotation: 1, x: 3, duration: .08, repeat: -1, yoyo: true, ease: 'none', repeatDelay: 1.2 });
+    }
+
+    // Entre Sombras y Luces: the club lights brighten and the fire grows.
+    if (decor && lyricsEl && decor.querySelector('.disco')) {
+      gsap.timeline({ scrollTrigger: { trigger: lyricsEl, start: 'top 60%', end: 'bottom 60%', scrub: 1 } })
+        .fromTo('.disco', { y: -40, opacity: .4 }, { y: 0, opacity: 1, ease: 'none' })
+        .fromTo('.flame', { scale: .5 }, { scale: 1.4, ease: 'none' }, 0);
+    }
+
+    if (decor && decor.querySelector('.heart')) {
       const lyrics = decor.parentElement!.querySelector('.lyrics')!;
       decor.style.setProperty('--h', `${lyrics.getBoundingClientRect().height + 100}px`);
       gsap.timeline({ scrollTrigger: { trigger: lyrics, start: 'top 60%', end: 'bottom 60%', scrub: 1 } })

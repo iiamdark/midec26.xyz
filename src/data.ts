@@ -33,7 +33,7 @@ export interface Song {
   // Las estrofas repetidas se marcan solas como estribillo.
   lyrics?: string;
   // Decoración animada junto a la letra.
-  decor?: 'heart';
+  decor?: 'heart' | 'phone' | 'light';
 }
 // Singles en Spotify, más reciente primero.
 export const songs: Song[] = [
@@ -83,9 +83,74 @@ Cupido me ha castigado por ser tan infantil
 * No nos llevamos bien así que mami ya vete`,
   },
   { slug: 'otra-noche-mala', apple: 'https://music.apple.com/es/album/otra-noche-mala/6773278814?i=6773278815', t: 'otra noche mala', date: '2026-06-05', dur: '2:50', spotify: '31nBNBk0WTlY2ImhqL0by4', color: 'blue' },
-  { slug: 'como-si-nada', apple: 'https://music.apple.com/es/album/como-si-nada/6777631745?i=6777631746', t: 'como si nada', date: '2026-05-24', dur: '2:14', spotify: '5tKnfZkIQIlqz6WyEGniTE', youtube: 'BWlaL_6-JOE', color: 'white' },
+  { slug: 'como-si-nada', apple: 'https://music.apple.com/es/album/como-si-nada/6777631745?i=6777631746', t: 'como si nada', date: '2026-05-24', dur: '2:14', spotify: '5tKnfZkIQIlqz6WyEGniTE', youtube: 'BWlaL_6-JOE', color: 'white', decor: 'phone',
+    lyrics: `Mami, sigues con él y quería verte, baby
+Me mentiste pero sigo aquí esperando en el centro de Madrid
+Sabía que no cambiarías
+Hicimos el amor, te enfadaste por tonterías
+
+Mami
+Tú siempre que hablas la cagas, porfa no digas nada
+Sé que me echas de menos, quiero tu llamada
+Y volver otra vez a dejarte mojada
+* Y después saludarnos como si nada
+
+Baby, no era tan fácil cuando estaba a tu lado
+Hasta parecía que me habías olvidado
+Después yo descubrí que me habías bloqueado
+* Pero sigo en tu fondo de pantalla guardado
+
+Un perreo duro con un conjunto Versace
+Yo la quiero mucho, no quiero que me rechace
+Hablando solo en una bici tropezando con los baches
+* Celosa como un tigre, carroñera cual mapache
+
+Bebé, ya van como 10 días que tú te alejaste de mí
+Desde que tú ya no eres mía
+Y quiero ser tuyo en la noche y por el día
+* Así que vamo' a hacerlo to' los días de tu vida`,
+  },
   { slug: 'ella-ella-ella', apple: 'https://music.apple.com/es/album/ella-ella-ella/1889116083?i=1889116084', t: 'Ella Ella Ella', date: '2026-03-05', dur: '2:45', spotify: '7034S4K1kVbdCmIWaM2HfH', explicit: true, color: 'coral' },
-  { slug: 'entre-sombras-y-luces', apple: 'https://music.apple.com/es/album/entre-sombras-y-luces/1850472087?i=1850472088', t: 'Entre Sombras y Luces', date: '2025-10-23', dur: '2:53', spotify: '1uoUt868ZsXBUzwR2snU7x', youtube: 'okZgYt5MAJ4', explicit: true, color: 'blue' },
+  { slug: 'entre-sombras-y-luces', apple: 'https://music.apple.com/es/album/entre-sombras-y-luces/1850472087?i=1850472088', t: 'Entre Sombras y Luces', date: '2025-10-23', dur: '2:53', spotify: '1uoUt868ZsXBUzwR2snU7x', youtube: 'okZgYt5MAJ4', explicit: true, color: 'blue', decor: 'light',
+    lyrics: `Entraste al party y se apagó la disco
+Brillabas tanto que hasta el humo se hizo listo
+Dices que no buscas nada, pero siempre insisto
+Tus labios hablan más que todo lo que has dicho
+
+Aunque digas que no quieres repetir
+* Se nota que en tu piel aún me guardas un sitio a mí
+
+Entre sombras y luces, tú y yo nos perdimos
+Jugamos con fuego, y al fuego nos fuimos
+Decías que era un error, pero caímos
+* Lo prohibido siempre sabe lo que elegimos
+
+La cama, un ring, sudando como atletas
+Tú eras mi gol en el minuto noventa
+Me pedías calma y yo rompía las reglas
+Amor clandestino, firmado en libreta
+
+* La noche testigo, la luna notario
+Tus besos delito, tu piel escenario
+Y aunque la City nunca duerme
+Siempre encontramos un hueco para pecar a diario
+
+* Dices que soy tu error favorito
+Pero vuelves al delito
+Como botella en la mano
+Que sabes que te mata... y aun así pides otro traguito
+No has aprendido nada, solo nos entendemos en la cama
+
+Entre sombras y luces, tú y yo nos perdimos
+Jugamos con fuego, y al fuego nos fuimos
+Decías que era un error, pero caímos
+Lo prohibido siempre sabe lo que elegimos
+
+Entre sombras y luces, tú y yo nos perdimos
+Jugamos con fuego, y al fuego nos fuimos
+Decías que era un error, pero caímos
+* Lo prohibido siempre sabe lo que elegimos`,
+  },
 ];
 
 export interface Video { id: string; t: string; k: string; y: string; dur: string }

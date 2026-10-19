@@ -222,6 +222,32 @@ function playIntro() {
   intro.querySelector('.skip')!.addEventListener('click', () => { fake.kill(); tl.progress(1); });
 }
 
+// Ads: fill every AdSense unit on the page that hasn't been filled yet.
+// The router swaps pages without a reload, so this runs on each page load.
+type AdsWindow = Window & { adsbygoogle?: unknown[]; googlefc?: { callbackQueue?: unknown[]; showRevocationMessage?: () => void } };
+const w = window as AdsWindow;
+document.addEventListener('astro:page-load', () => {
+  $$('ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(() => {
+    try { (w.adsbygoogle = w.adsbygoogle || []).push({}); } catch {}
+  });
+});
+
+// Click-to-load third-party players (no third-party cookies until asked).
+document.addEventListener('click', (e) => {
+  const target = e.target as Element;
+  if (target.closest('.facade a')) return;
+  const facade = target.closest<HTMLElement>('.facade');
+  if (facade && !facade.querySelector('iframe')) {
+    facade.innerHTML = `<iframe src="${facade.dataset.embedSrc}" title="${facade.dataset.embedTitle}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;
+    facade.classList.remove('facade');
+  }
+  // "Configurar cookies": reopen Google's consent message, or explain where it is.
+  if (target.closest('[data-consent-open]')) {
+    if (w.googlefc?.showRevocationMessage) w.googlefc.showRevocationMessage();
+    else location.href = '/legal/cookies';
+  }
+});
+
 // Night mode toggle: the new theme grows as a circle from the button.
 const themeBtn = document.querySelector<HTMLButtonElement>('.theme-toggle')!;
 const syncTheme = () => {

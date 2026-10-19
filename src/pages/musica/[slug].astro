@@ -1,6 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Lyrics from '../../components/Lyrics.astro';
+import Embed from '../../components/Embed.astro';
+import AdSlot from '../../components/AdSlot.astro';
 import { songs, cover, fmtDate, thumb, artist, label, platforms, type Song } from '../../data';
 
 export function getStaticPaths() {
@@ -39,9 +41,7 @@ const credits = [
   </section>
 
   <section class="pad embed-block">
-    <div class="embed small reveal">
-      <iframe src={`https://open.spotify.com/embed/track/${song.spotify}?theme=0`} title={`${song.t} en Spotify`} loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
-    </div>
+    <Embed src={`https://open.spotify.com/embed/track/${song.spotify}?theme=0`} title={`${song.t} en Spotify`} provider="Spotify" height={352} class="small" />
   </section>
 
   {song.youtube && (
@@ -62,6 +62,8 @@ const credits = [
       {credits.map(([k, v]) => <div class="reveal"><dt class="cap">{k}</dt><dd>{v}</dd></div>)}
     </dl>
   </section>
+
+  <AdSlot slot="song" />
 
   <nav class="pad prevnext" aria-label="Otros singles">
     {prev ? <a href={`/musica/${prev.slug}`} class="pop"><span class="cap">← Más nuevo</span><span class="h3">{prev.t}</span></a> : <span></span>}

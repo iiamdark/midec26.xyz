@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Cloud from '../components/Cloud.astro';
 import SongDisc from '../components/SongDisc.astro';
+import AdSlot from '../components/AdSlot.astro';
 import { artist, formerly, songs, tagline, cover, fmtDate, spotify } from '../data';
 const latest = songs[0];
 ---
@@ -59,6 +60,8 @@ const latest = songs[0];
       {songs.slice(1).map((s) => <SongDisc song={s} />)}
     </div>
   </section>
+
+  <AdSlot slot="home" />
 
   <section class="pad">
     <div class="next">

@@ -1,0 +1,21 @@
+---
+// A labelled AdSense unit. Renders nothing until an AdSense client ID is set
+// in src/legal.ts.
+import { ads, adsEnabled } from '../legal';
+interface Props { slot: keyof typeof ads.slots }
+const { slot } = Astro.props;
+const id = ads.slots[slot];
+---
+{adsEnabled() && (
+  <aside class="pad ad" aria-label="Publicidad">
+    <span class="ad-label cap">Publicidad</span>
+    <ins
+      class="adsbygoogle"
+      style="display:block"
+      data-ad-client={ads.adsenseClient}
+      data-ad-slot={id || undefined}
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+    ></ins>
+  </aside>
+)}

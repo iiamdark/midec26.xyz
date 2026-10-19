@@ -312,3 +312,34 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after, ::view-transition-new(root) { animation: none !important; transition: none !important; }
 }
+
+/* ads */
+.ad { padding-block: 5vh; }
+.ad-label { display: inline-block; margin-bottom: 8px; padding: 0 8px; border: 2px solid var(--ink); background: var(--white); }
+.ad ins { min-height: 120px; border: 3px dashed color-mix(in srgb, var(--ink) 30%, transparent); }
+
+/* click-to-load embeds */
+.embed.facade { height: var(--h); display: grid; }
+.embed iframe { height: var(--h, 452px); }
+.facade-btn { position: relative; display: grid; place-content: center; justify-items: center; gap: 10px; padding: 24px; background: var(--white); color: var(--ink); text-align: center; }
+.facade-btn .disc-play { position: relative; top: auto; left: auto; margin: 0 0 10px; }
+.facade-btn:hover .disc-play { transform: scale(1.15); }
+.facade-note { font-size: 13px; max-width: 36ch; opacity: .8; }
+.facade-note a { text-decoration: underline; }
+
+/* legal */
+.legal-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.legal-nav a { padding: 6px 14px; border: 3px solid var(--ink); background: var(--white); font-family: var(--display); }
+.legal-nav a[aria-current='page'], .legal-nav a:hover { background: var(--ink); color: var(--yellow); }
+.legal { max-width: 860px; padding-bottom: 12vh; font-size: 17px; line-height: 1.65; }
+.legal h2 { font-size: clamp(26px, 3vw, 36px); line-height: 1; margin: 48px 0 14px; }
+.legal p, .legal ul { margin-bottom: 14px; }
+.legal ul { padding-left: 22px; }
+.legal a { text-decoration: underline; text-underline-offset: 3px; }
+.legal code { font-size: .9em; padding: 0 4px; background: var(--white); border: 1px solid var(--ink); }
+.table-wrap { overflow-x: auto; margin: 10px 0 18px; border: var(--line); background: var(--white); }
+.legal table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.legal th, .legal td { padding: 10px 12px; text-align: left; vertical-align: top; border-bottom: 2px solid var(--ink); }
+.legal th { font-family: var(--display); font-weight: 400; background: var(--ink); color: var(--yellow); }
+footer .legal-links { margin-top: 20px; font-weight: 400; font-size: 13px; }
+footer .legal-links button { text-transform: uppercase; text-decoration: underline; text-underline-offset: 4px; }

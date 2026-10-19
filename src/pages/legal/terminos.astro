@@ -1,0 +1,35 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+import { legal } from '../../legal';
+---
+<LegalLayout title="Términos y condiciones" description="Condiciones de uso de la web oficial de Markho.">
+  <h2>1. Aceptación</h2>
+  <p>Al navegar por {legal.domain} aceptas estos términos, el <a href="/legal/aviso-legal">aviso legal</a>, la <a href="/legal/privacidad">política de privacidad</a> y la <a href="/legal/cookies">política de cookies</a>. Si no estás de acuerdo, no uses la web.</p>
+
+  <h2>2. Qué ofrece la web</h2>
+  <p>Información sobre el artista Markho, enlaces y reproductores de su música y vídeos, letras de sus canciones y una vía de contacto. Todo ello de forma gratuita. El titular puede modificar, ampliar o retirar contenidos en cualquier momento.</p>
+
+  <h2>3. Uso permitido</h2>
+  <ul>
+    <li>Puedes ver y escuchar el contenido para uso personal y privado.</li>
+    <li>Puedes compartir enlaces a la web y a sus páginas.</li>
+    <li>No puedes copiar, descargar masivamente, revender ni redistribuir canciones, letras, imágenes o vídeos sin permiso.</li>
+    <li>No puedes interferir en el funcionamiento de la web, ni usar robots o técnicas automatizadas que la sobrecarguen.</li>
+    <li>No puedes hacer clic en los anuncios de forma artificial o fraudulenta ni incitar a otros a hacerlo.</li>
+  </ul>
+
+  <h2>4. Letras de canciones</h2>
+  <p>Las letras publicadas son de Markho y se ofrecen solo para su lectura en esta web. No se publican letras de canciones de otros autores.</p>
+
+  <h2>5. Publicidad</h2>
+  <p>La web muestra anuncios de Google AdSense, siempre identificados con la etiqueta «Publicidad». El titular no es responsable de los productos o servicios anunciados, que son responsabilidad de cada anunciante. Si ves un anuncio inadecuado, avísanos en <a href={`mailto:${legal.email}`}>{legal.email}</a>.</p>
+
+  <h2>6. Contenido explícito</h2>
+  <p>Algunas canciones están marcadas como explícitas («E») por contener lenguaje para adultos.</p>
+
+  <h2>7. Cambios en los términos</h2>
+  <p>Estos términos pueden actualizarse. La fecha de la última actualización aparece arriba. Seguir usando la web después de un cambio supone aceptarlo.</p>
+
+  <h2>8. Ley aplicable</h2>
+  <p>Estos términos se rigen por la legislación española, sin perjuicio de los derechos que te reconozca la normativa de consumidores de tu país de residencia.</p>
+</LegalLayout>

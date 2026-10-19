@@ -1,0 +1,20 @@
+---
+import Layout from './Layout.astro';
+import { legal, legalLinks } from '../legal';
+interface Props { title: string; description: string }
+const { title, description } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '');
+---
+<Layout title={title} description={description}>
+  <section class="pad page-head" style="padding-bottom:4vh">
+    <span class="badge cap">Legal</span>
+    <h1 class="h1" style="margin-top:20px">{title}</h1>
+    <p class="cap" style="margin-top:20px;font-family:var(--chrome)">Última actualización: {legal.updated}</p>
+    <nav class="legal-nav" aria-label="Textos legales">
+      {legalLinks.map((l) => <a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a>)}
+    </nav>
+  </section>
+  <article class="pad legal">
+    <slot />
+  </article>
+</Layout>

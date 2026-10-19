@@ -3,6 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 import Cloud from '../../components/Cloud.astro';
 import SongDisc from '../../components/SongDisc.astro';
 import Collabs from '../../components/Collabs.astro';
+import Embed from '../../components/Embed.astro';
+import AdSlot from '../../components/AdSlot.astro';
 import { songs, spotify, spotifyId, fmtDate } from '../../data';
 ---
 <Layout title="Música" description="Todos los singles de Markho en Spotify.">
@@ -28,12 +30,11 @@ import { songs, spotify, spotifyId, fmtDate } from '../../data';
       ))}
     </ol>
   </section>
+  <AdSlot slot="music" />
   <Collabs />
   <section class="pad embed-block">
     <h2 class="h2 split">Escúchalo todo</h2>
-    <div class="embed reveal">
-      <iframe src={`https://open.spotify.com/embed/artist/${spotifyId}?theme=0`} title="Markho en Spotify" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
-    </div>
+    <Embed src={`https://open.spotify.com/embed/artist/${spotifyId}?theme=0`} title="Markho en Spotify" provider="Spotify" height={452} />
     <p style="padding:45px 0 10vh"><a class="btn" href={spotify} target="_blank" rel="noopener">Abrir en Spotify ↗</a></p>
   </section>
 </Layout>

@@ -1,0 +1,35 @@
+---
+import LegalLayout from '../../layouts/LegalLayout.astro';
+import { legal } from '../../legal';
+---
+<LegalLayout title="Política de privacidad" description="Cómo se tratan los datos personales en la web de Markho.">
+  <h2>1. Responsable del tratamiento</h2>
+  <ul>
+    <li><strong>Responsable:</strong> {legal.owner}</li>
+    <li><strong>NIF:</strong> {legal.nif}</li>
+    <li><strong>Domicilio:</strong> {legal.address}</li>
+    <li><strong>Contacto:</strong> <a href={`mailto:${legal.email}`}>{legal.email}</a></li>
+  </ul>
+
+  <h2>2. Qué datos se tratan y para qué</h2>
+  <ul>
+    <li><strong>Correo electrónico y mensajes que nos envías</strong> al escribir a la dirección de contacto: para responderte. Base legal: tu consentimiento y el interés legítimo en atender tu consulta (art. 6.1.a y 6.1.f RGPD).</li>
+    <li><strong>Datos de navegación y publicidad</strong> (identificadores de cookies, dirección IP, datos del dispositivo e interacción con los anuncios): los trata Google, como proveedor de publicidad, para mostrar anuncios y medir su rendimiento. Los anuncios personalizados solo se muestran si das tu consentimiento en el aviso de cookies. Base legal: tu consentimiento (art. 6.1.a RGPD y art. 22.2 LSSI-CE). Sin consentimiento, Google puede mostrar anuncios no personalizados usando cookies limitadas solo para prevención de fraude y frecuencia, conforme a su política.</li>
+    <li><strong>Reproductores de terceros</strong> (Spotify, YouTube, Instagram): solo se cargan cuando pulsas para reproducir. A partir de ese momento esos servicios pueden tratar tus datos según sus propias políticas.</li>
+  </ul>
+
+  <h2>3. Publicidad de Google</h2>
+  <p>Esta web usa Google AdSense. Google y sus socios utilizan cookies para mostrar anuncios basados en tus visitas a esta y otras webs. Puedes desactivar la publicidad personalizada en <a href="https://adssettings.google.com" target="_blank" rel="noopener">la configuración de anuncios de Google</a> y consultar cómo usa Google los datos en <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">policies.google.com/technologies/partner-sites</a>. También puedes cambiar tu elección en cualquier momento desde el enlace «Configurar cookies» del pie de página.</p>
+
+  <h2>4. Destinatarios y transferencias internacionales</h2>
+  <p>Los datos pueden ser tratados por Google Ireland Ltd. y otras empresas del grupo Google, por Vercel Inc. (alojamiento de la web) y por los proveedores de los reproductores que decidas usar. Algunos de ellos pueden transferir datos fuera del Espacio Económico Europeo, amparados en el Marco de Privacidad de Datos UE-EE. UU. o en cláusulas contractuales tipo aprobadas por la Comisión Europea.</p>
+
+  <h2>5. Conservación</h2>
+  <p>Los correos se conservan el tiempo necesario para responder y, después, durante los plazos legales aplicables. Los datos de cookies se conservan según los plazos indicados en la <a href="/legal/cookies">política de cookies</a>.</p>
+
+  <h2>6. Tus derechos</h2>
+  <p>Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad, así como retirar tu consentimiento en cualquier momento, escribiendo a <a href={`mailto:${legal.email}`}>{legal.email}</a>. Si consideras que no se han atendido correctamente, puedes reclamar ante la Agencia Española de Protección de Datos (<a href="https://www.aepd.es" target="_blank" rel="noopener">www.aepd.es</a>).</p>
+
+  <h2>7. Menores</h2>
+  <p>Esta web no está dirigida específicamente a menores de 14 años y no recoge conscientemente sus datos. Algunas canciones contienen lenguaje explícito.</p>
+</LegalLayout>

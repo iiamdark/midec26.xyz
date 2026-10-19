@@ -1,0 +1,13 @@
+---
+// Third-party player behind a click: nothing loads (and no third-party
+// cookies are set) until the visitor asks for it.
+interface Props { src: string; title: string; provider: string; height: number; class?: string }
+const { src, title, provider, height, class: cls = '' } = Astro.props;
+---
+<div class={`embed facade reveal ${cls}`} style={`--h:${height}px`} data-embed-src={src} data-embed-title={title}>
+  <button type="button" class="facade-btn">
+    <span class="disc-play" aria-hidden="true">▶</span>
+    <span class="sub">Cargar reproductor de {provider}</span>
+    <span class="facade-note">Al cargarlo, {provider} puede usar cookies. <a href="/legal/cookies">Más info</a></span>
+  </button>
+</div>

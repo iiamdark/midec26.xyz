@@ -3,6 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 import '@fontsource/changa-one';
 import '../styles/global.css';
 import Intro from '../components/Intro.astro';
+import { ads, adsEnabled, legalLinks } from '../legal';
 import { artist, formerly, nav, socials, email, songs, spotify, youtube, instagram, trackUrl, site, appleMusic, label } from '../data';
 
 interface Props { title?: string; description?: string; image?: string }
@@ -56,6 +57,10 @@ const jsonLd = {
       document.documentElement.classList.add('intro-on');
       try { if (localStorage.getItem('theme') === 'night') document.documentElement.dataset.theme = 'night'; } catch (e) {}
     </script>
+    {adsEnabled() && (
+      <script is:inline async crossorigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ads.adsenseClient}`}></script>
+    )}
+    {adsEnabled() && <meta name="google-adsense-account" content={ads.adsenseClient} />}
     <ClientRouter />
   </head>
   <body>
@@ -78,6 +83,10 @@ const jsonLd = {
         <ul>{socials.map((s) => <li><a href={s.href} target="_blank" rel="noopener">{s.label} ↗</a></li>)}</ul>
         <a href={`mailto:${email}`}>{email}</a>
       </div>
+      <nav class="row legal-links" aria-label="Textos legales">
+        {legalLinks.map((l) => <a href={l.href}>{l.label}</a>)}
+        <button type="button" data-consent-open>Configurar cookies</button>
+      </nav>
     </footer>
 
     <dialog class="player" transition:persist aria-label="Reproductor">

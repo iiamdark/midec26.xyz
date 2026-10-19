@@ -14,7 +14,7 @@ export const legal = {
 // opcionalmente, el ID de cada bloque de anuncios. Mientras adsenseClient
 // esté vacío no se carga ningún anuncio ni script de Google.
 export const ads = {
-  adsenseClient: '',
+  adsenseClient: 'ca-pub-7097157436814477',
   slots: {
     home: '',
     music: '',

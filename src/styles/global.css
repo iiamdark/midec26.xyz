@@ -343,3 +343,5 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
 .legal th { font-family: var(--display); font-weight: 400; background: var(--ink); color: var(--yellow); }
 footer .legal-links { margin-top: 20px; font-weight: 400; font-size: 13px; }
 footer .legal-links button { text-transform: uppercase; text-decoration: underline; text-underline-offset: 4px; }
+/* Hide an ad unit until Google actually fills it (e.g. before approval). */
+.ad:not(:has(ins[data-ad-status='filled'])) { display: none; }

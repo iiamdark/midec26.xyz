@@ -232,6 +232,13 @@ document.addEventListener('astro:page-load', () => {
   });
 });
 
+function toast(text: string) {
+  const el = Object.assign(document.createElement('div'), { className: 'toast', role: 'status', textContent: text });
+  document.body.append(el);
+  gsap.fromTo(el, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: .4, ease: 'back.out(2)' });
+  gsap.to(el, { y: 40, opacity: 0, delay: 5, duration: .3, onComplete: () => el.remove() });
+}
+
 // Click-to-load third-party players (no third-party cookies until asked).
 document.addEventListener('click', (e) => {
   const target = e.target as Element;
@@ -241,10 +248,14 @@ document.addEventListener('click', (e) => {
     facade.innerHTML = `<iframe src="${facade.dataset.embedSrc}" title="${facade.dataset.embedTitle}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;
     facade.classList.remove('facade');
   }
-  // "Configurar cookies": reopen Google's consent message, or explain where it is.
+  // "Configurar cookies": queue Google's consent message (it runs once
+  // Google's CMP has loaded). If it never runs, the CMP isn't live yet.
   if (target.closest('[data-consent-open]')) {
-    if (w.googlefc?.showRevocationMessage) w.googlefc.showRevocationMessage();
-    else location.href = '/legal/cookies';
+    let shown = false;
+    w.googlefc = w.googlefc || {};
+    w.googlefc.callbackQueue = w.googlefc.callbackQueue || [];
+    w.googlefc.callbackQueue.push(() => { shown = true; w.googlefc!.showRevocationMessage?.(); });
+    setTimeout(() => { if (!shown) toast('El aviso de cookies aún se está activando. Mientras tanto no usamos cookies publicitarias personalizadas.'); }, 1500);
   }
 });
 

@@ -345,3 +345,4 @@ footer .legal-links { margin-top: 20px; font-weight: 400; font-size: 13px; }
 footer .legal-links button { text-transform: uppercase; text-decoration: underline; text-underline-offset: 4px; }
 /* Hide an ad unit until Google actually fills it (e.g. before approval). */
 .ad:not(:has(ins[data-ad-status='filled'])) { height: 0; padding-block: 0; overflow: hidden; }
+.toast { position: fixed; left: 50%; bottom: 20px; z-index: 300; width: min(520px, calc(100vw - 32px)); margin-left: max(-260px, calc(-50vw + 16px)); padding: 14px 18px; border: var(--line); background: var(--white); color: var(--ink); font-family: var(--display); font-size: 17px; line-height: 1.3; }

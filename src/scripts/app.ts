@@ -30,6 +30,7 @@ function finishEntry(){
   gsap.set([entry,...entry.querySelectorAll('.entry-arrow,.entry-word,.entry-top,.entry-bottom')],{clearProps:'all'});
   syncScrollLock();
   document.dispatchEvent(new Event('mk:entry-complete'));
+  requestAnimationFrame(()=>{lenis.resize();ScrollTrigger.refresh();});
 }
 function runEntry(){
   if(entryComplete)return;
@@ -107,7 +108,7 @@ function initPage(){
   const galleryProgress=document.querySelector<HTMLElement>('.gallery-progress');
   const galleryFill=galleryProgress?.querySelector<HTMLElement>('span');
   const galleryCurrent=document.querySelector<HTMLElement>('[data-gallery-current]');
-  const galleryButtons=$<HTMLButtonElement>('[data-release-index]');
+  const galleryButtons=$$<HTMLButtonElement>('[data-release-index]');
   let pinnedGallery:ScrollTrigger|undefined;
   let galleryIndex=-1;
   const updateGallery=(progress:number)=>{

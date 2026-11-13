@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 import { ads, adsEnabled, legalLinks } from '../legal';
 import { artist, formerly, nav, socials, email, songs, spotify, youtube, instagram, trackUrl, site, appleMusic, label, cover, playSource } from '../data';
@@ -29,7 +28,7 @@ const jsonLd = {
 };
 ---
 <!doctype html>
-<html lang="es" transition:animate="none">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -71,18 +70,21 @@ const jsonLd = {
       <script is:inline async crossorigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ads.adsenseClient}`}></script>
     )}
     {adsEnabled() && <meta name="google-adsense-account" content={ads.adsenseClient} />}
-    <ClientRouter />
   </head>
   <body>
-    <dialog id="entry-intro" class="entry-intro" aria-labelledby="entry-title" transition:persist>
+    <dialog id="entry-intro" class="entry-intro" aria-labelledby="entry-title">
       <div class="entry-top cap"><span id="entry-title">MARKHO / El mañana suena hoy</span><span>EST. 2025</span></div>
-      <div class="entry-center"><span class="entry-coordinate cap" aria-hidden="true">026 / Hacia delante</span><svg class="entry-arrow" viewBox="0 0 180 180" aria-hidden="true"><path d="M30 130 115 45H55V15h110v110h-30V65l-85 85z" /></svg><span class="entry-word" aria-hidden="true">MARKHO</span></div>
+      <svg class="entry-mask-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><mask id="entry-portal-cutout" maskUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%" style="mask-type:luminance"><rect width="100%" height="100%" fill="white" /><path class="entry-mask-shape" d="M-65 45 20-40H-40V-70H70V40H40V-20L-45 65Z" transform="translate(500 440)" fill="black" /></mask></defs>
+        <rect width="100%" height="100%" fill="#11120f" mask="url(#entry-portal-cutout)" />
+        <path class="entry-mask-tint" d="M-65 45 20-40H-40V-70H70V40H40V-20L-45 65Z" transform="translate(500 440)" fill="#e4fb63" />
+      </svg>
+      <div class="entry-center"><span class="entry-coordinate cap" aria-hidden="true">026 / Hacia delante</span><span class="entry-word" aria-hidden="true">MARKHO</span></div>
       <div class="entry-bottom"><span class="cap">Una nueva frecuencia.</span><button type="button" class="entry-skip text-link" autofocus>Saltar intro <span>↗</span></button></div>
     </dialog>
-    <div class="route-curtain" aria-hidden="true" transition:persist><svg viewBox="0 0 180 180"><path d="M30 130 115 45H55V15h110v110h-30V65l-85 85z" /></svg><span class="cap">Siempre hacia arriba.</span></div>
     <a class="skip-link" href="#main">Saltar al contenido</a>
-    <div class="scroll-progress" aria-hidden="true" transition:persist></div>
-    <nav class="top" aria-label="Navegación principal" transition:persist>
+    <div class="scroll-progress" aria-hidden="true"></div>
+    <nav class="top" aria-label="Navegación principal">
       <a class="brand" href="/" aria-label="Markho, inicio">MK<span>↗</span></a>
       <ul class="desktop-links">
         {nav.map((n, i) => <li><a href={n.href} aria-current={(n.href === '/' ? path === '/' : path.startsWith(n.href)) ? 'page' : undefined}><span class="nav-index" aria-hidden="true">0{i + 1}</span>{n.label}</a></li>)}
@@ -90,7 +92,7 @@ const jsonLd = {
       <button type="button" class="theme-toggle" aria-label="Activar tema claro" aria-pressed="false" title="Cambiar tema"><span aria-hidden="true">◐</span></button>
       <button type="button" class="menu-toggle" aria-label="Abrir menú" aria-controls="mobile-menu" aria-expanded="false"><span>Menú</span><span class="menu-icon" aria-hidden="true"><i></i><i></i></span></button>
     </nav>
-    <dialog id="mobile-menu" class="mobile-menu" aria-labelledby="menu-title" transition:persist>
+    <dialog id="mobile-menu" class="mobile-menu" aria-labelledby="menu-title">
       <div class="menu-heading"><span id="menu-title" class="cap">MARKHO / Explora</span><button type="button" class="menu-close" aria-label="Cerrar menú">✕</button></div>
       <nav aria-label="Menú móvil"><ul>{nav.map((n, i) => <li><a href={n.href}><span class="cap">0{i + 1}</span><span>{n.label}</span><span class="menu-link-arrow" aria-hidden="true">↗</span></a></li>)}</ul></nav>
       <div class="menu-footer"><span class="cap">Música para lo que viene.</span><a href={spotify} target="_blank" rel="noopener" class="text-link">Spotify <span>↗</span></a></div>
@@ -108,7 +110,7 @@ const jsonLd = {
       </nav>
     </footer>
 
-    <dialog class="player" transition:persist aria-label="Reproductor">
+    <dialog class="player" aria-label="Reproductor">
       <div class="player-bar">
         <span class="cap">Estás escuchando</span>
         <button type="button" class="player-close" aria-label="Cerrar">✕</button>

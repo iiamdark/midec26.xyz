@@ -53,8 +53,7 @@ function runEntry(){
     .call(()=>document.dispatchEvent(new Event('mk:entry-reveal')),[],.62)
     .to('.entry-word,.entry-top,.entry-bottom,.entry-coordinate',{opacity:0,duration:.23},.62)
     .to(tint,{opacity:0,duration:.28,ease:'power2.out'},.65)
-    .to(portal,{scale:Math.hypot(width,height)/9,duration:.92,ease:'power3.in'},.65)
-    .fromTo('.hero',{scale:1.12,filter:'blur(4px)'},{scale:1,filter:'blur(0px)',duration:1.05,ease:'power3.out',clearProps:'transform,filter'},.7);
+    .to(portal,{scale:Math.hypot(width,height)/9,duration:.92,ease:'power3.in'},.65);
 }
 entry.querySelector('.entry-skip')!.addEventListener('click',finishEntry);
 entry.addEventListener('cancel',event=>{event.preventDefault();finishEntry();});
@@ -142,15 +141,14 @@ function initPage(){
         });
       });
       if(document.querySelector('.hero')){
+        // Entrance owns these text transforms; scroll never rewrites or hides them.
         const enter=gsap.timeline({paused:!entryComplete})
-          .from('.hero-word',{yPercent:105,opacity:0,duration:1.05,ease:'power4.out',clearProps:'opacity'},0)
-          .from('.hero-enter',{y:28,opacity:0,duration:.85,stagger:.08,ease:'power3.out',clearProps:'transform,opacity'},.16);
+          .fromTo('.hero-word',{y:20,opacity:0},{y:0,opacity:1,duration:.75,ease:'power3.out',clearProps:'transform,opacity'},0)
+          .fromTo('.hero-enter',{y:12,opacity:0},{y:0,opacity:1,duration:.6,stagger:.05,ease:'power3.out',clearProps:'transform,opacity'},.08);
         heroReady=()=>{enter.play();};
         document.addEventListener('mk:entry-complete',heroReady,{once:true});
         document.addEventListener('mk:entry-reveal',heroReady,{once:true});
-        gsap.to('.hero-art',{yPercent:22,rotation:8,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
-        gsap.to('.hero-copy',{y:-80,opacity:0,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'65% top',scrub:1}});
-        gsap.to('.hero-word',{yPercent:25,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+        gsap.to('.hero-art',{yPercent:10,rotation:3,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
       }
       $$('.split').forEach(el=>gsap.from(el.querySelectorAll('.w>span'),{yPercent:110,duration:1,ease:'power4.out',stagger:.05,scrollTrigger:{trigger:el,start:'top 92%',once:true}}));
       $$('.reveal').forEach(el=>gsap.from(el,{y:30,opacity:0,duration:.9,ease:'power3.out',clearProps:'transform,opacity',scrollTrigger:{trigger:el,start:'top 94%',once:true}}));

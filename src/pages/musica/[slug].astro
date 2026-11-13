@@ -26,13 +26,14 @@ const credits = [
 ---
 <Layout title={song.t} description={`«${song.t}» de ${artist}. Lanzamiento publicado el ${fmtDate(song.date)}.`} image={cover(song)}>
   <section class="pad song-hero">
-    <img class={`song-cover pop ${song.color}`} src={cover(song)} alt={`Portada de ${song.t}`} width="640" height="640" />
+    <div class="song-artwork pop"><div class="song-artwork-top cap"><span>MK / ARCHIVO {String(i + 1).padStart(2, '0')}</span><span>{year}</span></div><img class={`song-cover ${song.color}`} src={cover(song)} alt={`Portada de ${song.t}`} width="640" height="640" /><span class="song-artwork-stamp" aria-hidden="true">↗</span><span class="song-artwork-bottom cap">{song.project || 'Single'} / MARKHO</span></div>
     <div>
       <a href="/musica" class="cap back">← Música</a>
       <h1 class="h1 split">{song.t}</h1>
-      <p class="sub reveal" style="margin-top:20px">{song.project || 'Single'} · {fmtDate(song.date)} · {song.dur}{song.explicit && ' · Explícito'}</p>
+      <p class="song-project eyebrow reveal">{song.project || 'Single'}{song.explicit && ' / Explícito'}</p>
+      <dl class="song-meta reveal"><div><dt>Lanzamiento</dt><dd>{fmtDate(song.date)}</dd></div><div><dt>Duración</dt><dd>{song.dur}</dd></div><div><dt>Artista</dt><dd>Markho</dd></div></dl>
       <div class="actions reveal">
-        <button type="button" class="btn" data-play={playSource(song)} data-title={song.t}>▶ Escuchar</button>
+        <button type="button" class="btn" data-play={playSource(song)} data-title={song.t}>Escuchar ahora</button>
       </div>
       <ul class="platforms reveal" aria-label="Escuchar en">
         {platforms(song).map((p) => <li><a href={p.href} target="_blank" rel="noopener">{p.label} ↗</a></li>)}
@@ -57,7 +58,7 @@ const credits = [
   <Lyrics song={song} />
 
   <section class="pad credits-block">
-    <h2 class="h2 split" style="margin-bottom:45px">Créditos</h2>
+    <div class="credits-heading"><p class="eyebrow"><span class="section-index">MK /</span> Ficha técnica</p><h2 class="h2 split">Los créditos<span class="accent">.</span></h2></div>
     <dl class="credits">
       {credits.map(([k, v]) => <div class="reveal"><dt class="cap">{k}</dt><dd>{v}</dd></div>)}
     </dl>
@@ -65,8 +66,8 @@ const credits = [
 
   <AdSlot slot="song" />
 
-  <nav class="pad prevnext" aria-label="Otras canciones">
-    {prev ? <a href={`/musica/${prev.slug}`} class="pop"><span class="cap">← Más nuevo</span><span class="h3">{prev.t}</span></a> : <span></span>}
-    {next ? <a href={`/musica/${next.slug}`} class="pop"><span class="cap">Anterior →</span><span class="h3">{next.t}</span></a> : <span></span>}
+  <nav class="pad prevnext song-neighbours" aria-label="Otras canciones">
+    {prev ? <a href={`/musica/${prev.slug}`} class="next-song pop"><img src={cover(prev)} alt="" width="300" height="300" loading="lazy" /><span class="next-song-copy"><span class="cap">← Más reciente</span><span class="h3">{prev.t}</span><span class="cap">{prev.project || 'Single'} / {prev.dur}</span></span><span class="next-song-arrow" aria-hidden="true">↖</span></a> : <a href="/musica" class="next-song next-song-archive pop"><span class="next-song-copy"><span class="cap">← El archivo completo</span><span class="h3">Toda la música</span><span class="cap">{songs.length} canciones / MARKHO</span></span><span class="next-song-arrow" aria-hidden="true">↗</span></a>}
+    <a href={`/musica/${(next || songs[0]).slug}`} class="next-song pop"><img src={cover(next || songs[0])} alt="" width="300" height="300" loading="lazy" /><span class="next-song-copy"><span class="cap">Siguiente en el archivo →</span><span class="h3">{(next || songs[0]).t}</span><span class="cap">{(next || songs[0]).project || 'Single'} / {(next || songs[0]).dur}</span></span><span class="next-song-arrow" aria-hidden="true">↗</span></a>
   </nav>
 </Layout>

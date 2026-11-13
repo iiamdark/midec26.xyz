@@ -2,7 +2,7 @@
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 import { ads, adsEnabled, legalLinks } from '../legal';
-import { artist, formerly, nav, socials, email, songs, spotify, youtube, instagram, trackUrl, site, appleMusic, label } from '../data';
+import { artist, formerly, nav, socials, email, songs, spotify, youtube, instagram, trackUrl, site, appleMusic, label, cover, playSource } from '../data';
 
 interface Props { title?: string; description?: string; image?: string }
 const {
@@ -29,7 +29,7 @@ const jsonLd = {
 };
 ---
 <!doctype html>
-<html lang="es">
+<html lang="es" transition:animate="none">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -53,6 +53,19 @@ const jsonLd = {
     <link rel="icon" href="/favicon.svg" />
     <script is:inline>
       try { if (localStorage.getItem('mk-theme-v2') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}
+      try {
+        if (location.pathname === '/' && !location.hash && !sessionStorage.getItem('mk-entry-v1') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.classList.add('entry-pending');
+          setTimeout(() => {
+            if (!document.documentElement.classList.contains('entry-pending')) return;
+            document.documentElement.classList.remove('entry-pending');
+            const entry = document.getElementById('entry-intro');
+            if (entry && entry.open) entry.close();
+            document.dispatchEvent(new Event('mk:intro-timeout'));
+          }, 3500);
+        }
+      } catch (e) {}
+
     </script>
     {adsEnabled() && (
       <script is:inline async crossorigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ads.adsenseClient}`}></script>
@@ -61,17 +74,29 @@ const jsonLd = {
     <ClientRouter />
   </head>
   <body>
+    <dialog id="entry-intro" class="entry-intro" aria-labelledby="entry-title" transition:persist>
+      <div class="entry-top cap"><span id="entry-title">MARKHO / El mañana suena hoy</span><span>EST. 2025</span></div>
+      <div class="entry-center"><span class="entry-coordinate cap" aria-hidden="true">026 / Hacia delante</span><svg class="entry-arrow" viewBox="0 0 180 180" aria-hidden="true"><path d="M30 130 115 45H55V15h110v110h-30V65l-85 85z" /></svg><span class="entry-word" aria-hidden="true">MARKHO</span></div>
+      <div class="entry-bottom"><span class="cap">Una nueva frecuencia.</span><button type="button" class="entry-skip text-link" autofocus>Saltar intro <span>↗</span></button></div>
+    </dialog>
+    <div class="route-curtain" aria-hidden="true" transition:persist><svg viewBox="0 0 180 180"><path d="M30 130 115 45H55V15h110v110h-30V65l-85 85z" /></svg><span class="cap">Siempre hacia arriba.</span></div>
     <a class="skip-link" href="#main">Saltar al contenido</a>
     <div class="scroll-progress" aria-hidden="true" transition:persist></div>
     <nav class="top" aria-label="Navegación principal" transition:persist>
       <a class="brand" href="/" aria-label="Markho, inicio">MK<span>↗</span></a>
-      <ul>
+      <ul class="desktop-links">
         {nav.map((n, i) => <li><a href={n.href} aria-current={(n.href === '/' ? path === '/' : path.startsWith(n.href)) ? 'page' : undefined}><span class="nav-index" aria-hidden="true">0{i + 1}</span>{n.label}</a></li>)}
       </ul>
       <button type="button" class="theme-toggle" aria-label="Activar tema claro" aria-pressed="false" title="Cambiar tema"><span aria-hidden="true">◐</span></button>
+      <button type="button" class="menu-toggle" aria-label="Abrir menú" aria-controls="mobile-menu" aria-expanded="false"><span>Menú</span><span class="menu-icon" aria-hidden="true"><i></i><i></i></span></button>
     </nav>
+    <dialog id="mobile-menu" class="mobile-menu" aria-labelledby="menu-title" transition:persist>
+      <div class="menu-heading"><span id="menu-title" class="cap">MARKHO / Explora</span><button type="button" class="menu-close" aria-label="Cerrar menú">✕</button></div>
+      <nav aria-label="Menú móvil"><ul>{nav.map((n, i) => <li><a href={n.href}><span class="cap">0{i + 1}</span><span>{n.label}</span><span class="menu-link-arrow" aria-hidden="true">↗</span></a></li>)}</ul></nav>
+      <div class="menu-footer"><span class="cap">Música para lo que viene.</span><a href={spotify} target="_blank" rel="noopener" class="text-link">Spotify <span>↗</span></a></div>
+    </dialog>
 
-    <main id="main"><slot /></main>
+    <main id="main" tabindex="-1"><slot /></main>
 
     <footer class="pad">
       <div class="footer-heading"><p class="eyebrow">El siguiente capítulo empieza contigo.</p><a class="footer-cta" href={`mailto:${email}`}>Hablemos <span>↗</span></a></div>
@@ -85,11 +110,15 @@ const jsonLd = {
 
     <dialog class="player" transition:persist aria-label="Reproductor">
       <div class="player-bar">
-        <span class="sub player-title"></span>
+        <span class="cap">Estás escuchando</span>
         <button type="button" class="player-close" aria-label="Cerrar">✕</button>
       </div>
-      <div class="player-frame"></div>
+      <div class="player-meta"><img class="player-art" alt="" width="96" height="96" hidden /><div class="player-details"><span class="player-platform cap"></span><h2 class="player-title"></h2><span class="player-context cap"></span></div><a class="player-external" target="_blank" rel="noopener" aria-label="Abrir en la plataforma">↗</a></div>
+      <div class="player-frame" aria-busy="false"></div>
+      <div class="player-foot"><span class="player-state cap" role="status">Preparando reproductor</span><span class="cap">MARKHO / Dale al play</span></div>
     </dialog>
+
+    <script id="player-catalog" type="application/json" set:html={JSON.stringify(songs.map(s => ({ source: playSource(s), title: s.t, image: cover(s), context: `${s.project || 'Single'} · ${s.dur}` }))).replace(/</g, '\\u003c')} />
 
     <script>
       import '../scripts/app.ts';

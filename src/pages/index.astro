@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { artist, formerly, songs, cover, fmtDate, spotify, playSource, videos, thumb } from '../data';
+import { artist, formerly, songs, cover, fmtDate, spotify, playSource, thumb } from '../data';
 const releases = songs.slice(0, 4);
 const latest = songs[0];
 ---
@@ -36,18 +36,30 @@ const latest = songs[0];
     <div class="release-window" tabindex="0" aria-label="Los cuatro temas de Mañana; desplaza para explorar">
       <div class="release-rail">
         {releases.map((s, i) => (
-          <article class="release-card">
+          <article class="release-card" data-release={s.slug}>
             <div class="release-card-top cap"><span>MK / {String(i + 1).padStart(2, '0')}</span><span>{s.dur} — 2026</span></div>
             <button type="button" class="release-art" data-play={playSource(s)} data-title={s.t} aria-label={`Reproducir ${s.t}`}>
               <img src={cover(s)} alt={`Visual de ${s.t}`} width="640" height="480" loading="lazy" />
-              <span class="release-art-word" aria-hidden="true">MAÑANA</span>
+              <span class="release-art-word" aria-hidden="true">{s.t}</span>
+              <span class="release-art-number" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <svg class="release-motif" viewBox="0 0 160 160" aria-hidden="true">
+                {i === 0 && <g><path d="m35 130 30-100M65 140 30-100M95 150 30-100" /></g>}
+                {i === 1 && <g><circle cx="80" cy="80" r="48" /><ellipse cx="80" cy="80" rx="72" ry="22" transform="rotate(-35 80 80)" /><path d="m109 32 12-12m-12 0h12v12" /></g>}
+                {i === 2 && <path d="M20 140V110H50V80H80V50H110V20H140M110 20h30v30" />}
+                {i === 3 && <g><path d="M20 55V20h35m50 0h35v35m0 50v35h-35m-50 0H20v-35M60 110V50l50 30z" /></g>}
+              </svg>
               <span class="release-play" aria-hidden="true">↗</span>
-              <span class="cap release-art-tag">Markho / Visualizer</span>
+              <span class="cap release-art-tag">Mañana / Corte {String(i + 1).padStart(2, '0')}</span>
             </button>
             <div class="release-caption"><h3><a href={`/musica/${s.slug}`}>{s.t}</a></h3><a href={`/musica/${s.slug}`} class="circle-link" aria-label={`Ver ${s.t}`}>↗</a></div>
           </article>
         ))}
       </div>
+    </div>
+    <div class="gallery-controls pad">
+      <span class="gallery-count cap"><span data-gallery-current aria-live="polite">01</span><span class="gallery-total"> / 04</span></span>
+      <div class="gallery-progress" role="progressbar" aria-label="Recorrido de Mañana" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1"><span></span></div>
+      <div class="gallery-dots">{releases.map((s,i) => <button type="button" data-release-index={i} aria-label={`Ir a ${s.t}`} aria-current={i===0?'true':undefined}><span class="cap">{String(i+1).padStart(2,'0')}</span></button>)}</div>
     </div>
     <div class="release-bottom pad cap"><span>Disponible en YouTube</span><a href="/videos">Ver todos los visuales ↗</a><span>13.11.2026</span></div>
   </section>

@@ -280,8 +280,8 @@ document.addEventListener('astro:before-swap',event=>{
 document.addEventListener('astro:after-swap',()=>{syncTheme();syncScrollLock();});
 document.addEventListener('astro:page-load',()=>{
   initPage();syncTheme();
-  $$('ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(()=>{try{(w.adsbygoogle=w.adsbygoogle||[]).push({});}catch{}});
+  $document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(()=>{try{(w.adsbygoogle=w.adsbygoogle||[]).push({});}catch{}});
 });
 motion.addEventListener('change',()=>{if(motion.matches)finishEntry();lenis.options.smoothWheel=!motion.matches;initPage();});
 runEntry();syncTheme();initPage();
-$('ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(()=>{try{(w.adsbygoogle=w.adsbygoogle||[]).push({});}catch{}});
+document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(()=>{try{(w.adsbygoogle=w.adsbygoogle||[]).push({});}catch{}});

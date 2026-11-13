@@ -7,11 +7,11 @@ import Embed from '../../components/Embed.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { songs, spotify, spotifyId, fmtDate } from '../../data';
 ---
-<Layout title="Música" description="Todos los singles de Markho en Spotify.">
+<Layout title="Música" description="Todas las canciones de Markho en Spotify y YouTube.">
   <section class="pad page-head scene" style="min-height:auto">
     <Cloud style="top:22%;right:6%" speed={0.8} />
     <h1 class="h1 split">Música</h1>
-    <p class="reveal">{songs.length} singles en Spotify. Toca un disco para escucharlo aquí mismo.</p>
+    <p class="reveal">{songs.length} canciones en Spotify y YouTube. Toca un disco para escucharlo aquí mismo.</p>
   </section>
   <section class="pad">
     <div class="discs">

@@ -1,4 +1,4 @@
-// Datos sacados de Spotify y del canal de YouTube @MarkhoES (octubre 2026).
+// Datos sacados de Spotify y del canal de YouTube @MarkhoES (noviembre 2026).
 export const artist = 'MARKHO';
 export const formerly = 'midec26';
 export const tagline = 'Artista emergente español · Género urbano';
@@ -26,7 +26,7 @@ export type Color = 'blue' | 'coral' | 'white';
 export interface Credits { producer?: string; mix?: string; master?: string; cover?: string; writers?: string }
 export interface Song {
   slug: string; t: string; date: string; dur: string;
-  spotify: string; apple?: string; youtube?: string; explicit?: boolean; color: Color;
+  spotify?: string; project?: string; apple?: string; youtube?: string; explicit?: boolean; color: Color;
   credits?: Credits;
   // Letra: estrofas separadas por una línea en blanco. Una línea que empieza
   // por "* " es una frase destacada y una que empieza por "> " es hablada.
@@ -35,8 +35,12 @@ export interface Song {
   // Decoración animada junto a la letra.
   decor?: 'heart' | 'phone' | 'light';
 }
-// Singles en Spotify, más reciente primero.
+// Canciones, más recientes primero. Las plataformas se incluyen solo cuando están verificadas.
 export const songs: Song[] = [
+  {"slug":"animal","t":"Animal","date":"2026-11-13","dur":"2:19","youtube":"ynMqdsAylIA","color":"coral","project":"Mañana"},
+  {"slug":"tomorrow-on-top","t":"Tomorrow on Top","date":"2026-11-13","dur":"2:32","youtube":"yt3t-TYQsgI","color":"blue","project":"Mañana"},
+  {"slug":"level-up","t":"level up","date":"2026-11-13","dur":"2:38","youtube":"XN2htWIrcbc","color":"white","project":"Mañana"},
+  {"slug":"scorsese","t":"Scorsese","date":"2026-11-13","dur":"2:12","youtube":"oIOCnQZN9S8","color":"coral","project":"Mañana"},
   { slug: 'san-valentin', apple: 'https://music.apple.com/es/album/san-valent%C3%ADn/6792689093?i=6792689094', t: 'San Valentín', date: '2026-07-24', dur: '2:51', spotify: '0FDdG1ZYNEHfE83WNCAp3u', youtube: 'YGt95E2D3go', explicit: true, color: 'coral', decor: 'heart',
     lyrics: `Extraño tu cama como si fuera mía
 Que tú me echas de menos eso ya lo sabía
@@ -155,6 +159,10 @@ Decías que era un error, pero caímos
 
 export interface Video { id: string; t: string; k: string; y: string; dur: string }
 export const videos: Video[] = [
+  {"id":"ynMqdsAylIA","t":"Animal","k":"Visualizer · Mañana","y":"2026","dur":"2:19"},
+  {"id":"yt3t-TYQsgI","t":"Tomorrow on Top","k":"Visualizer · Mañana","y":"2026","dur":"2:32"},
+  {"id":"XN2htWIrcbc","t":"level up","k":"Visualizer · Mañana","y":"2026","dur":"2:38"},
+  {"id":"oIOCnQZN9S8","t":"Scorsese","k":"Visualizer · Mañana","y":"2026","dur":"2:12"},
   { id: 'YGt95E2D3go', t: 'San Valentín', k: 'Visualizer', y: '2026', dur: '2:53' },
   { id: 'BWlaL_6-JOE', t: 'Como si nada', k: 'Visualizer', y: '2026', dur: '2:11' },
   { id: 'okZgYt5MAJ4', t: 'Entre Sombras y Luces', k: 'Videoclip oficial', y: '2025', dur: '2:53' },
@@ -162,13 +170,21 @@ export const videos: Video[] = [
 ];
 
 export const platforms = (s: Song) => [
-  { label: 'Spotify', href: trackUrl(s) },
+  ...(s.spotify ? [{ label: 'Spotify', href: trackUrl(s) }] : []),
   ...(s.apple ? [{ label: 'Apple Music', href: s.apple }] : []),
   ...(s.youtube ? [{ label: 'YouTube', href: `https://www.youtube.com/watch?v=${s.youtube}` }] : []),
 ];
-export const cover = (s: Song) => `/img/cover-${s.slug}.jpg`;
-export const thumb = (id: string) => `/img/${id}.jpg`;
-export const trackUrl = (s: Song) => `https://open.spotify.com/track/${s.spotify}`;
+const newVideoIds = new Set(["ynMqdsAylIA","yt3t-TYQsgI","XN2htWIrcbc","oIOCnQZN9S8"]);
+export const cover = (s: Song) => s.youtube && newVideoIds.has(s.youtube)
+  ? thumb(s.youtube)
+  : `/img/cover-${s.slug}.jpg`;
+export const thumb = (id: string) => newVideoIds.has(id)
+  ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
+  : `/img/${id}.jpg`;
+export const trackUrl = (s: Song) => s.spotify
+  ? `https://open.spotify.com/track/${s.spotify}`
+  : `https://www.youtube.com/watch?v=${s.youtube}`;
+export const playSource = (s: Song) => s.spotify ? `spotify:${s.spotify}` : `youtube:${s.youtube}`;
 const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 export const fmtDate = (iso: string) => { const [y, m, d] = iso.split('-'); return `${+d} ${months[+m - 1]} ${y}`; };
 

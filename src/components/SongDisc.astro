@@ -1,9 +1,9 @@
 ---
-import { cover, fmtDate, type Song } from '../data';
+import { cover, fmtDate, playSource, type Song } from '../data';
 interface Props { song: Song; index?: number }
 const { song, index } = Astro.props;
 ---
-<button type="button" class={`disc pop ${song.color}`} data-play={`spotify:${song.spotify}`} data-title={song.t} aria-label={`Escuchar ${song.t} en Spotify`}>
+<button type="button" class={`disc pop ${song.color}`} data-play={playSource(song)} data-title={song.t} aria-label={`Escuchar ${song.t} en ${song.spotify ? 'Spotify' : 'YouTube'}`}>
   <img src={cover(song)} alt="" loading="lazy" width="640" height="640" />
   <span class="disc-play" aria-hidden="true">▶</span>
   <span class="disc-label">

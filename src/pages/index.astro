@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Cloud from '../components/Cloud.astro';
 import SongDisc from '../components/SongDisc.astro';
 import AdSlot from '../components/AdSlot.astro';
-import { artist, formerly, songs, tagline, cover, fmtDate, spotify } from '../data';
+import { artist, formerly, songs, tagline, cover, fmtDate, spotify, playSource } from '../data';
 const latest = songs[0];
 ---
 <Layout>
@@ -14,7 +14,7 @@ const latest = songs[0];
     <div class="hero-top">
       <img class="face hero-in" src="/img/markho.jpg" alt={`Foto de ${artist}`} width="900" height="900" />
       <span class="badge cap hero-in">{tagline}</span>
-      <button type="button" class="btn hero-in" data-play={`spotify:${latest.spotify}`} data-title={latest.t}>▶ Escuchar «{latest.t}»</button>
+      <button type="button" class="btn hero-in" data-play={playSource(latest)} data-title={latest.t}>▶ Escuchar «{latest.t}»</button>
     </div>
     <div class="globe" data-globe></div>
     <svg class="globe-text" viewBox="0 0 1000 500" aria-label={artist}>
@@ -34,7 +34,7 @@ const latest = songs[0];
       <span class="split">Antes</span> <span class="strike" data-strike>{formerly}.</span><br />
       <span class="split">Ahora {artist}.</span>
     </h2>
-    <p class="sub reveal" style="max-width:560px;margin-top:45px">Artista emergente español que está empezando a hacer canciones. Música urbana, visuales propios y {songs.length} singles ya en Spotify.</p>
+    <p class="sub reveal" style="max-width:560px;margin-top:45px">Artista emergente español que está empezando a hacer canciones. Música urbana, visuales propios y {songs.length} canciones publicadas.</p>
   </section>
 
   <section class="pad feature">
@@ -42,18 +42,18 @@ const latest = songs[0];
       <img src={cover(latest)} alt={`Portada de ${latest.t}`} width="640" height="640" loading="lazy" />
     </a>
     <div>
-      <span class="badge cap reveal">Último single · {fmtDate(latest.date)}</span>
+      <span class="badge cap reveal">Último lanzamiento · {fmtDate(latest.date)}</span>
       <h2 class="h1 split" style="margin-top:20px">{latest.t}</h2>
       <div class="actions reveal">
-        <button type="button" class="btn" data-play={`spotify:${latest.spotify}`} data-title={latest.t}>▶ Spotify</button>
-        {latest.youtube && <button type="button" class="btn ghost" data-play={`youtube:${latest.youtube}`} data-title={latest.t}>▶ Visualizer</button>}
+        <button type="button" class="btn" data-play={playSource(latest)} data-title={latest.t}>▶ {latest.spotify ? 'Spotify' : 'YouTube'}</button>
+        {latest.spotify && latest.youtube && <button type="button" class="btn ghost" data-play={`youtube:${latest.youtube}`} data-title={latest.t}>▶ Visualizer</button>}
       </div>
     </div>
   </section>
 
   <section class="pad">
     <div class="head-row">
-      <h2 class="h2 split">Singles</h2>
+      <h2 class="h2 split">Canciones</h2>
       <a class="btn ghost reveal" href={spotify} target="_blank" rel="noopener">Seguir en Spotify ↗</a>
     </div>
     <div class="discs">

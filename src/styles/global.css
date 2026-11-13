@@ -324,3 +324,6 @@ dialog.player{width:min(1040px,94vw);box-shadow:0 35px 100px #0008}
   .catalog-play,.circle-link{min-width:40px;min-height:40px}
 }
 @media(prefers-reduced-motion:reduce){.entry-pending .entry-intro:not([open]){display:none}.route-curtain{display:none}.release-motif{transform:none!important}.hero-enter,.hero-word{will-change:auto}.gallery-progress>span{transition:none}.player-frame.is-loading::before{animation:none}.btn:hover,.text-link:hover span,.next-song:hover .next-song-arrow,.catalog-play:hover,.circle-link:hover{transform:none}}
+
+.hero-bottom [data-replay-entry]{font:inherit;letter-spacing:inherit;text-transform:uppercase;color:var(--acid);padding:0;min-height:20px;transition:color .3s}.hero-bottom [data-replay-entry]:hover{color:var(--ink)}
+@media(max-width:700px){.hero-bottom>span{display:none}.hero-bottom [data-replay-entry]{font-size:8px;white-space:nowrap}}

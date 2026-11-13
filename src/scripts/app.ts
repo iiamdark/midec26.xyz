@@ -252,6 +252,7 @@ const w=window as AdsWindow;
 function toast(message:string){const el=document.createElement('div');el.className='toast';el.role='status';el.textContent=message;document.body.append(el);setTimeout(()=>el.remove(),6000);}
 document.addEventListener('click',event=>{
   const target=event.target as Element;
+  if(target.closest('[data-replay-entry]')){entryComplete=false;document.documentElement.classList.add('entry-pending');lenis.scrollTo(0,{immediate:true,force:true});runEntry();initPage();}
   const btn=target.closest<HTMLElement>('[data-play]');if(btn)play(btn);
   if(!target.closest('.facade a')){
     const facade=target.closest<HTMLElement>('.facade');

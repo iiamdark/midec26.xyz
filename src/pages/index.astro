@@ -1,73 +1,86 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Cloud from '../components/Cloud.astro';
-import SongDisc from '../components/SongDisc.astro';
-import AdSlot from '../components/AdSlot.astro';
-import { artist, formerly, songs, tagline, cover, fmtDate, spotify, playSource } from '../data';
+import { artist, formerly, songs, cover, fmtDate, spotify, playSource, videos, thumb } from '../data';
+const releases = songs.slice(0, 4);
 const latest = songs[0];
 ---
-<Layout>
-  <section class="scene hero">
-    <Cloud style="top:20%;left:5%" speed={0.6} />
-    <Cloud style="top:40%;right:6%;width:clamp(160px,22vw,320px)" speed={1.2} />
-    <Cloud style="top:64%;left:20%;width:clamp(90px,12vw,170px)" speed={0.9} />
-    <div class="hero-top">
-      <img class="face hero-in" src="/img/markho.jpg" alt={`Foto de ${artist}`} width="900" height="900" />
-      <span class="badge cap hero-in">{tagline}</span>
-      <button type="button" class="btn hero-in" data-play={playSource(latest)} data-title={latest.t}>▶ Escuchar «{latest.t}»</button>
+<Layout description="El mañana suena hoy. Música, visualizers y el universo de MARKHO. Descubre Mañana y escucha sus últimos lanzamientos.">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="orb-fallback"></div>
+      <canvas data-sculpture></canvas>
+      <span class="art-coordinate cap">MK / FRECUENCIA 026</span>
     </div>
-    <div class="globe" data-globe></div>
-    <svg class="globe-text" viewBox="0 0 1000 500" aria-label={artist}>
-      <path id="arc" d="M60 470 A520 520 0 0 1 940 470" fill="none" />
-      <text font-size="190" text-anchor="middle"><textPath href="#arc" startOffset="50%">{artist}</textPath></text>
-    </svg>
+    <div class="hero-topline cap"><span><i class="status-dot"></i> Artista independiente · España</span><span>Nuevo capítulo / 2026</span></div>
+    <div class="hero-copy">
+      <p class="eyebrow hero-enter">El mañana suena hoy.</p>
+      <p class="hero-statement hero-enter">Siempre<br />hacia <em>arriba.</em></p>
+      <a href="#manana" class="text-link hero-enter">Descubre Mañana <span aria-hidden="true">↗</span></a>
+    </div>
+    <button class="hero-release hero-enter" type="button" data-play={playSource(latest)} data-title={latest.t} aria-label={`Escuchar ${latest.t} en YouTube`}>
+      <img src={cover(latest)} alt="" width="120" height="90" />
+      <span><span class="cap">Sonando ahora</span><strong>{latest.t}</strong></span>
+      <span class="round-arrow" aria-hidden="true">▶</span>
+    </button>
+    <h1 id="hero-title" class="hero-word" aria-label={artist}>{artist}<span class="word-star" aria-hidden="true">✳</span></h1>
+    <div class="hero-bottom cap"><a href="#manana">Scroll para entrar ↓</a><span>Música / Visuales / Sin pausa</span><span>Antes {formerly}</span></div>
   </section>
 
-  <div class="marquee" aria-hidden="true">
-    <div class="track">
-      {[0, 1].map(() => [...songs.map((s) => s.t), artist].map((w) => <span>{w}</span>))}
+  <section id="manana" class="release-section" aria-labelledby="release-title">
+    <div class="section-heading pad">
+      <div><p class="eyebrow"><span class="section-index">01 /</span> El nuevo capítulo</p><h2 id="release-title" class="h1 split">Mañana<span class="accent">.</span></h2></div>
+      <p class="section-note">Cuatro temas.<br />Una dirección: hacia delante.</p>
+      <span class="rail-hint cap" aria-hidden="true">Desliza para explorar ↔</span>
     </div>
-  </div>
-
-  <section class="pad intro-block">
-    <h2 class="h1">
-      <span class="split">Antes</span> <span class="strike" data-strike>{formerly}.</span><br />
-      <span class="split">Ahora {artist}.</span>
-    </h2>
-    <p class="sub reveal" style="max-width:560px;margin-top:45px">Artista emergente español que está empezando a hacer canciones. Música urbana, visuales propios y {songs.length} canciones publicadas.</p>
-  </section>
-
-  <section class="pad feature">
-    <a href={`/musica/${latest.slug}`} class="feature-media square pop" aria-label={`Ver ${latest.t}`}>
-      <img src={cover(latest)} alt={`Portada de ${latest.t}`} width="640" height="640" loading="lazy" />
-    </a>
-    <div>
-      <span class="badge cap reveal">Último lanzamiento · {fmtDate(latest.date)}</span>
-      <h2 class="h1 split" style="margin-top:20px">{latest.t}</h2>
-      <div class="actions reveal">
-        <button type="button" class="btn" data-play={playSource(latest)} data-title={latest.t}>▶ {latest.spotify ? 'Spotify' : 'YouTube'}</button>
-        {latest.spotify && latest.youtube && <button type="button" class="btn ghost" data-play={`youtube:${latest.youtube}`} data-title={latest.t}>▶ Visualizer</button>}
+    <div class="release-window" tabindex="0" aria-label="Los cuatro temas de Mañana; desplaza para explorar">
+      <div class="release-rail">
+        {releases.map((s, i) => (
+          <article class="release-card">
+            <div class="release-card-top cap"><span>MK / {String(i + 1).padStart(2, '0')}</span><span>{s.dur} — 2026</span></div>
+            <button type="button" class="release-art" data-play={playSource(s)} data-title={s.t} aria-label={`Reproducir ${s.t}`}>
+              <img src={cover(s)} alt={`Visual de ${s.t}`} width="640" height="480" loading="lazy" />
+              <span class="release-art-word" aria-hidden="true">MAÑANA</span>
+              <span class="release-play" aria-hidden="true">↗</span>
+              <span class="cap release-art-tag">Markho / Visualizer</span>
+            </button>
+            <div class="release-caption"><h3><a href={`/musica/${s.slug}`}>{s.t}</a></h3><a href={`/musica/${s.slug}`} class="circle-link" aria-label={`Ver ${s.t}`}>↗</a></div>
+          </article>
+        ))}
       </div>
     </div>
+    <div class="release-bottom pad cap"><span>Disponible en YouTube</span><a href="/videos">Ver todos los visuales ↗</a><span>13.11.2026</span></div>
   </section>
 
-  <section class="pad">
-    <div class="head-row">
-      <h2 class="h2 split">Canciones</h2>
-      <a class="btn ghost reveal" href={spotify} target="_blank" rel="noopener">Seguir en Spotify ↗</a>
-    </div>
-    <div class="discs">
-      {songs.slice(1).map((s) => <SongDisc song={s} />)}
-    </div>
+  <div class="ticker" aria-hidden="true"><div class="ticker-track">{[0, 1, 2, 3].map(() => <span>DE ABAJO HACIA ARRIBA <b>↗</b> SIN MIRAR ATRÁS <b>✳</b></span>)}</div></div>
+
+  <section class="artist-section pad" aria-labelledby="artist-title">
+    <div class="artist-image"><img data-parallax src="/img/markho.jpg" alt="Retrato de Markho" width="900" height="900" loading="lazy" /><span class="image-label cap">MARKHO / EN PRIMERA PERSONA</span><span class="image-cross" aria-hidden="true">+</span></div>
+    <div class="artist-copy"><p class="eyebrow reveal"><span class="section-index">02 /</span> Detrás del nombre</p><h2 id="artist-title" class="h1 split">Mismo pulso.<br />Nueva<br /><em>frecuencia.</em></h2><p class="body-copy reveal">Antes {formerly}. Ahora MARKHO. Música urbana, historias propias y una forma de mirar hacia lo que viene. Cada canción, una nueva pieza del proyecto.</p><a href="/sobre" class="text-link reveal">Conoce a Markho <span>↗</span></a></div>
   </section>
 
-  <AdSlot slot="home" />
+  <section class="catalog-section pad" aria-labelledby="catalog-title">
+    <div class="section-heading"><div><p class="eyebrow"><span class="section-index">03 /</span> El archivo</p><h2 id="catalog-title" class="h1 split">Dale al play<span class="accent">.</span></h2></div><a href="/musica" class="text-link">Toda la música <span>↗</span></a></div>
+    <ol class="catalog-list">
+      {songs.slice(4).map((s, i) => (
+        <li class="catalog-row">
+          <span class="cap catalog-number">{String(i + 1).padStart(2, '0')}</span>
+          <img src={cover(s)} alt="" width="80" height="80" loading="lazy" />
+          <a class="catalog-title" href={`/musica/${s.slug}`}>{s.t}</a>
+          <span class="cap catalog-date">{fmtDate(s.date)}</span>
+          <span class="cap catalog-duration">{s.dur}</span>
+          <button class="catalog-play" type="button" data-play={playSource(s)} data-title={s.t} aria-label={`Escuchar ${s.t}`}>↗</button>
+        </li>
+      ))}
+    </ol>
+    <a href={spotify} target="_blank" rel="noopener" class="text-link catalog-follow">Seguir en Spotify <span>↗</span></a>
+  </section>
 
-  <section class="pad">
-    <div class="next">
-      <a href="/musica" class="pop">Música →</a>
-      <a href="/videos" class="pop">Vídeos →</a>
-      <a href="/sobre" class="pop">Sobre →</a>
-    </div>
+  <section class="home-visual pad" aria-labelledby="visual-title">
+    <div class="section-heading"><div><p class="eyebrow"><span class="section-index">04 /</span> En movimiento</p><h2 id="visual-title" class="h1 split">Dale al <em>rec.</em></h2></div><a href="/videos" class="text-link">Todos los vídeos <span>↗</span></a></div>
+    <button type="button" class="cinema-frame" data-play="youtube:okZgYt5MAJ4" data-title="Entre Sombras y Luces" aria-label="Ver Entre Sombras y Luces">
+      <img data-parallax src={thumb('okZgYt5MAJ4')} alt="Markho en el videoclip Entre Sombras y Luces" width="1280" height="720" loading="lazy" />
+      <span class="cinema-top cap"><span>Videoclip oficial</span><span>MARKHO / 2025</span></span><span class="cinema-play" aria-hidden="true">▶</span><span class="cinema-title">Entre sombras<br />y luces<span>↗</span></span>
+    </button>
   </section>
 </Layout>

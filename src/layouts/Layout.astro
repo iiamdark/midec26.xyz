@@ -1,8 +1,6 @@
 ---
 import { ClientRouter } from 'astro:transitions';
-import '@fontsource/changa-one';
 import '../styles/global.css';
-import Intro from '../components/Intro.astro';
 import { ads, adsEnabled, legalLinks } from '../legal';
 import { artist, formerly, nav, socials, email, songs, spotify, youtube, instagram, trackUrl, site, appleMusic, label } from '../data';
 
@@ -51,11 +49,10 @@ const jsonLd = {
     <meta name="twitter:image" content={ogImage} />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-    <meta name="theme-color" content="#ffe600" />
+    <meta name="theme-color" content="#11120f" />
     <link rel="icon" href="/favicon.svg" />
     <script is:inline>
-      document.documentElement.classList.add('intro-on');
-      try { if (localStorage.getItem('theme') === 'night') document.documentElement.dataset.theme = 'night'; } catch (e) {}
+      try { if (localStorage.getItem('mk-theme-v2') === 'light') document.documentElement.dataset.theme = 'light'; } catch (e) {}
     </script>
     {adsEnabled() && (
       <script is:inline async crossorigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ads.adsenseClient}`}></script>
@@ -64,28 +61,25 @@ const jsonLd = {
     <ClientRouter />
   </head>
   <body>
-    <Intro />
-    <nav class="top" transition:persist>
+    <a class="skip-link" href="#main">Saltar al contenido</a>
+    <div class="scroll-progress" aria-hidden="true" transition:persist></div>
+    <nav class="top" aria-label="Navegación principal" transition:persist>
+      <a class="brand" href="/" aria-label="Markho, inicio">MK<span>↗</span></a>
       <ul>
-        {nav.map((n) => <li><a href={n.href} aria-current={(n.href === '/' ? path === '/' : path.startsWith(n.href)) ? 'page' : undefined}>{n.label}</a></li>)}
+        {nav.map((n, i) => <li><a href={n.href} aria-current={(n.href === '/' ? path === '/' : path.startsWith(n.href)) ? 'page' : undefined}><span class="nav-index" aria-hidden="true">0{i + 1}</span>{n.label}</a></li>)}
       </ul>
-      <button type="button" class="theme-toggle" aria-label="Modo noche" aria-pressed="false" title="Modo noche">
-        <svg viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path class="moon" d="M6 2h4v1h2v1h1v2h-3V5H8v1H7v4h1v1h2v-1h3v2h-1v1h-2v1H6v-1H4v-1H3v-2H2V6h1V4h1V3h2z"/><path class="sun" d="M7 1h2v2H7zM7 13h2v2H7zM1 7h2v2H1zM13 7h2v2h-2zM3 3h2v2H3zM11 3h2v2h-2zM3 11h2v2H3zM11 11h2v2h-2zM6 5h4v1h1v4h-1v1H6v-1H5V6h1z"/></svg>
-      </button>
+      <button type="button" class="theme-toggle" aria-label="Activar tema claro" aria-pressed="false" title="Cambiar tema"><span aria-hidden="true">◐</span></button>
     </nav>
 
-    <main><slot /></main>
+    <main id="main"><slot /></main>
 
     <footer class="pad">
-      <div class="giant" aria-hidden="true">{artist}</div>
-      <div class="row">
-        <span>© 2026 {artist} · antes {formerly}</span>
-        <ul>{socials.map((s) => <li><a href={s.href} target="_blank" rel="noopener">{s.label} ↗</a></li>)}</ul>
-        <a href={`mailto:${email}`}>{email}</a>
-      </div>
+      <div class="footer-heading"><p class="eyebrow">El siguiente capítulo empieza contigo.</p><a class="footer-cta" href={`mailto:${email}`}>Hablemos <span>↗</span></a></div>
+      <div class="row"><span class="cap">© 2026 {artist} / antes {formerly}</span><ul>{socials.map((s) => <li><a href={s.href} target="_blank" rel="noopener">{s.label} ↗</a></li>)}</ul><a href={`mailto:${email}`}>{email}</a></div>
+      <div class="footer-word" aria-hidden="true">{artist}<span>↗</span></div>
       <nav class="row legal-links" aria-label="Textos legales">
         {legalLinks.map((l) => <a href={l.href}>{l.label}</a>)}
-        <button type="button" data-consent-open>Configurar cookies</button>
+        <button type="button" data-consent-open>Configurar cookies</button><span class="footer-status"><i class="status-dot"></i> Siempre en movimiento</span>
       </nav>
     </footer>
 

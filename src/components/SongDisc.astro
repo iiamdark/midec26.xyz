@@ -3,12 +3,11 @@ import { cover, fmtDate, playSource, type Song } from '../data';
 interface Props { song: Song; index?: number }
 const { song, index } = Astro.props;
 ---
-<button type="button" class={`disc pop ${song.color}`} data-play={playSource(song)} data-title={song.t} aria-label={`Escuchar ${song.t} en ${song.spotify ? 'Spotify' : 'YouTube'}`}>
-  <img src={cover(song)} alt="" loading="lazy" width="640" height="640" />
-  <span class="disc-play" aria-hidden="true">▶</span>
-  <span class="disc-label">
-    {index !== undefined && <span class="cap">{String(index + 1).padStart(2, '0')}</span>}
-    <span class="h3">{song.t}</span>
-    <span class="cap">{fmtDate(song.date)} · {song.dur}{song.explicit && ' · E'}</span>
-  </span>
-</button>
+<article class="disc pop">
+  <button type="button" class="disc-art" data-play={playSource(song)} data-title={song.t} aria-label={`Escuchar ${song.t} en ${song.spotify ? 'Spotify' : 'YouTube'}`}>
+    <img src={cover(song)} alt={`Portada de ${song.t}`} loading="lazy" width="640" height="640" />
+    <span class="disc-play" aria-hidden="true">↗</span>
+    <span class="disc-art-index cap">{String((index ?? 0) + 1).padStart(2, '0')} / MARKHO</span>
+  </button>
+  <div class="disc-label"><a class="h3" href={`/musica/${song.slug}`}>{song.t}</a><span class="cap">{fmtDate(song.date)} · {song.dur}{song.explicit && ' · E'}</span></div>
+</article>

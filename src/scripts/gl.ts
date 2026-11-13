@@ -1,152 +1,120 @@
-// Minimal WebGL helpers: fullscreen fragment shaders and a wireframe globe.
-
-const VERT = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
-
-function compile(gl: WebGLRenderingContext, type: number, src: string) {
-  const s = gl.createShader(type)!;
-  gl.shaderSource(s, src);
-  gl.compileShader(s);
-  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
-  return s;
+// A reflective torus knot, built directly with WebGL. No external 3D runtime.
+type Vec3 = [number, number, number];
+const vertex = `
+attribute vec3 aPosition;
+attribute vec3 aNormal;
+uniform vec2 uResolution;
+uniform vec2 uPointer;
+uniform float uTime;
+uniform float uScroll;
+varying vec3 vNormal;
+varying vec3 vPosition;
+mat3 rotateY(float a) { float c=cos(a),s=sin(a); return mat3(c,0.,s,0.,1.,0.,-s,0.,c); }
+mat3 rotateX(float a) { float c=cos(a),s=sin(a); return mat3(1.,0.,0.,0.,c,-s,0.,s,c); }
+void main() {
+  mat3 rot = rotateY(uTime*.12 + uPointer.x*.22 + uScroll*1.5) * rotateX(.45 + uPointer.y*.18 + uScroll*.65);
+  vec3 p = rot * aPosition;
+  p.y += sin(uTime*.6)*.055;
+  vPosition = p;
+  vNormal = rot * aNormal;
+  float depth = 4.5 - p.z;
+  vec2 projected = p.xy * 3.2 / depth;
+  projected.x /= uResolution.x/uResolution.y;
+  gl_Position = vec4(projected, -p.z*.05, 1.);
+}`;
+const fragment = `
+precision mediump float;
+varying vec3 vNormal;
+varying vec3 vPosition;
+vec3 environment(vec3 r) {
+  float band = pow(abs(sin(r.y*3.8 + r.x*1.4)), 14.);
+  float studio = smoothstep(.15,.52,r.y)*.75;
+  float strip = pow(max(0.,1.-abs(r.x*.7+r.z*.65)),28.);
+  vec3 col=vec3(.055,.065,.07) + vec3(.65,.68,.65)*studio + vec3(.95,.98,.9)*band*.85;
+  col += vec3(.82,.94,.18) * pow(max(0.,-r.x*.8+r.y*.2+r.z*.3),8.) * .75;
+  return col + strip*vec3(.9,.92,.84);
 }
-
-function program(gl: WebGLRenderingContext, vs: string, fs: string) {
-  const p = gl.createProgram()!;
-  gl.attachShader(p, compile(gl, gl.VERTEX_SHADER, vs));
-  gl.attachShader(p, compile(gl, gl.FRAGMENT_SHADER, fs));
-  gl.linkProgram(p);
-  gl.useProgram(p);
-  return p;
-}
-
-function resize(canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
-  const dpr = Math.min(window.devicePixelRatio, 1.75);
-  const w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
-  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
-}
-
-// Runs fn every frame while the canvas is on screen.
-function loop(canvas: HTMLCanvasElement, fn: (t: number) => void) {
-  let visible = false, raf = 0;
-  const start = performance.now();
-  const tick = () => { fn((performance.now() - start) / 1000); if (visible) raf = requestAnimationFrame(tick); };
-  new IntersectionObserver(([e]) => {
-    visible = e.isIntersecting;
-    cancelAnimationFrame(raf);
-    if (visible) raf = requestAnimationFrame(tick);
-  }).observe(canvas);
-}
-
-export type Uniforms = Record<string, () => number | number[]>;
-
-export function shaderCanvas(canvas: HTMLCanvasElement, frag: string, uniforms: Uniforms = {}) {
-  const gl = canvas.getContext('webgl', { antialias: false, premultipliedAlpha: false });
-  if (!gl) return;
-  const prog = program(gl, VERT, 'precision highp float;\nuniform vec2 uRes; uniform float uTime;\n' + frag);
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-  const loc = gl.getAttribLocation(prog, 'p');
-  gl.enableVertexAttribArray(loc);
-  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  const uRes = gl.getUniformLocation(prog, 'uRes'), uTime = gl.getUniformLocation(prog, 'uTime');
-  const custom = Object.entries(uniforms).map(([k, f]) => [gl.getUniformLocation(prog, k), f] as const);
-  loop(canvas, (t) => {
-    resize(canvas, gl);
-    gl.uniform2f(uRes, canvas.width, canvas.height);
-    gl.uniform1f(uTime, t);
-    for (const [l, f] of custom) {
-      const v = f();
-      if (typeof v === 'number') gl.uniform1f(l, v);
-      else if (v.length === 2) gl.uniform2f(l, v[0], v[1]);
-      else gl.uniform3f(l, v[0], v[1], v[2]);
-    }
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-  });
-}
-
-const NOISE = `
-float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float noise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
-  return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y); }
-float fbm(vec2 p){ float v = 0., a = .5; mat2 r = mat2(.8,.6,-.6,.8); for(int i=0;i<6;i++){ v += a*noise(p); p = r*p*2.02; a *= .5; } return v; }
-`;
-
-// Cinematic monochrome smoke with a mouse-driven light and film grain.
-export const HERO_FRAG = NOISE + `
-uniform vec2 uMouse; uniform float uScroll;
-void main(){
-  vec2 uv = gl_FragCoord.xy / uRes; vec2 p = (gl_FragCoord.xy - .5*uRes) / uRes.y;
-  float t = uTime * .06;
-  vec2 q = vec2(fbm(p*1.6 + t), fbm(p*1.6 - t + 4.));
-  float f = fbm(p*1.4 + 2.2*q + vec2(0., uScroll*1.5));
-  vec2 m = (uMouse - .5) * vec2(uRes.x/uRes.y, 1.);
-  float light = .55 / (1. + 6.*length(p - m));
-  float c = pow(f, 2.2) * (.45 + light) + .35*pow(q.x*q.y, 3.);
-  // thin horizontal scan lines like a blueprint
-  c += .025 * step(.995, fract(uv.y * 60. + t));
-  c *= smoothstep(1.25, .2, length(p * vec2(.8, 1.))); // vignette
-  c *= 1. - uScroll * .6;
-  c += (hash(gl_FragCoord.xy + fract(uTime)) - .5) * .06; // grain
-  gl_FragColor = vec4(vec3(c), 1.);
+void main() {
+  vec3 n=normalize(vNormal), eye=normalize(vec3(0.,0.,4.5)-vPosition);
+  vec3 r=reflect(-eye,n);
+  float fresnel=pow(1.-max(0.,dot(n,eye)),3.);
+  vec3 col=environment(r);
+  col *= .6 + .4*max(0.,dot(n,normalize(vec3(-1.,2.,3.))));
+  col += fresnel*vec3(.48,.55,.32);
+  col=pow(col,vec3(.88));
+  gl_FragColor=vec4(col,1.);
 }`;
 
-// Flowing contour lines tinted with a card/panel colour.
-export const FLOW_FRAG = NOISE + `
-uniform vec3 uColor; uniform float uSeed; uniform float uHover;
-void main(){
-  vec2 p = gl_FragCoord.xy / uRes.y;
-  float t = uTime * (.05 + uHover * .15);
-  float f = fbm(p * 2.2 + uSeed * 7.3 + vec2(t, -t * .7));
-  float lines = abs(fract(f * 12.) - .5);
-  float l = smoothstep(.06, .0, lines) * (.25 + uHover * .35);
-  vec3 col = uColor * (.85 + .3 * f) + l;
-  gl_FragColor = vec4(col, 1.);
-}`;
+const norm=(v:Vec3):Vec3=>{ const l=Math.hypot(...v)||1;return v.map(x=>x/l) as Vec3; };
+const sub=(a:Vec3,b:Vec3):Vec3=>a.map((x,i)=>x-b[i]) as Vec3;
+const cross=(a:Vec3,b:Vec3):Vec3=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const center=(t:number):Vec3=>[(2+Math.cos(3*t))*Math.cos(2*t)*.43,(2+Math.cos(3*t))*Math.sin(2*t)*.43,Math.sin(3*t)*.43];
+function knot() {
+  const positions:number[]=[], normals:number[]=[];
+  const point=(i:number,j:number)=>{
+    const t=i/180*Math.PI*2, a=j/20*Math.PI*2, p=center(t);
+    const tangent=norm(sub(center(t+.001),center(t-.001)));
+    const side=norm(cross(tangent,Math.abs(tangent[2])>.95?[0,1,0]:[0,0,1]));
+    const up=cross(side,tangent);
+    const n=side.map((v,k)=>v*Math.cos(a)+up[k]*Math.sin(a)) as Vec3;
+    return {p:p.map((v,k)=>v+n[k]*.245) as Vec3,n};
+  };
+  for(let i=0;i<180;i++) for(let j=0;j<20;j++) {
+    const a=point(i,j),b=point(i+1,j),c=point(i+1,j+1),d=point(i,j+1);
+    for(const v of [a,b,c,a,c,d]) {positions.push(...v.p);normals.push(...v.n);}
+  }
+  return {positions:new Float32Array(positions),normals:new Float32Array(normals)};
+}
 
-// Rotating wireframe globe drawn with GL_LINES.
-export function globe(canvas: HTMLCanvasElement, getSpin: () => number) {
-  const gl = canvas.getContext('webgl', { antialias: true, alpha: true });
-  if (!gl) return;
-  const prog = program(gl,
-    `attribute vec3 p; uniform float uRot; uniform float uTilt; uniform float uAspect; varying float vZ;
-     void main(){
-       float c = cos(uRot), s = sin(uRot); vec3 q = vec3(c*p.x + s*p.z, p.y, -s*p.x + c*p.z);
-       float ct = cos(uTilt), st = sin(uTilt); q = vec3(q.x, ct*q.y - st*q.z, st*q.y + ct*q.z);
-       vZ = q.z; float persp = 1. / (2.6 - q.z);
-       gl_Position = vec4(q.x * persp * 2.1 / uAspect, q.y * persp * 2.1, 0., 1.);
-     }`,
-    `precision mediump float; varying float vZ; void main(){ gl_FragColor = vec4(1., 1., 1., mix(.08, .7, (vZ + 1.) * .5)); }`);
-  const v: number[] = [];
-  const seg = 96;
-  const pt = (lat: number, lon: number) => [Math.cos(lat) * Math.cos(lon), Math.sin(lat), Math.cos(lat) * Math.sin(lon)];
-  for (let i = 1; i < 12; i++) { // parallels
-    const lat = -Math.PI / 2 + (i * Math.PI) / 12;
-    for (let j = 0; j < seg; j++) v.push(...pt(lat, (j / seg) * Math.PI * 2), ...pt(lat, ((j + 1) / seg) * Math.PI * 2));
+export function sculpture(canvas:HTMLCanvasElement,reduced:boolean) {
+  const noop=()=>{};
+  let gl:WebGLRenderingContext|null;
+  try { gl=canvas.getContext('webgl',{alpha:true,antialias:true,powerPreference:'low-power'}); } catch { return noop; }
+  if(!gl) return noop;
+  const shaders:WebGLShader[]=[],buffers:WebGLBuffer[]=[];
+  const compile=(kind:number,source:string)=>{
+    const s=gl!.createShader(kind);
+    if(!s) return null;
+    shaders.push(s); gl!.shaderSource(s,source);gl!.compileShader(s);
+    return gl!.getShaderParameter(s,gl!.COMPILE_STATUS)?s:null;
+  };
+  const vs=compile(gl.VERTEX_SHADER,vertex),fs=compile(gl.FRAGMENT_SHADER,fragment),prog=gl.createProgram();
+  const release=()=>{buffers.forEach(b=>gl!.deleteBuffer(b));shaders.forEach(s=>gl!.deleteShader(s));if(prog)gl!.deleteProgram(prog);};
+  if(!vs||!fs||!prog){release();return noop;}
+  gl.attachShader(prog,vs);gl.attachShader(prog,fs);gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){release();return noop;}
+  gl.useProgram(prog);
+  const mesh=knot();
+  for(const [name,data] of [['aPosition',mesh.positions],['aNormal',mesh.normals]] as const) {
+    const buffer=gl.createBuffer();if(!buffer){release();return noop;}buffers.push(buffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);
+    const loc=gl.getAttribLocation(prog,name);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
   }
-  for (let i = 0; i < 18; i++) { // meridians
-    const lon = (i / 18) * Math.PI * 2;
-    for (let j = 0; j < seg; j++) v.push(...pt(-Math.PI / 2 + (j / seg) * Math.PI, lon), ...pt(-Math.PI / 2 + ((j + 1) / seg) * Math.PI, lon));
-  }
-  // orbit ring
-  for (let j = 0; j < seg; j++) {
-    const a = (j / seg) * Math.PI * 2, b = ((j + 1) / seg) * Math.PI * 2;
-    v.push(Math.cos(a) * 1.35, Math.sin(a) * .25, Math.sin(a) * 1.35, Math.cos(b) * 1.35, Math.sin(b) * .25, Math.sin(b) * 1.35);
-  }
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(v), gl.STATIC_DRAW);
-  const loc = gl.getAttribLocation(prog, 'p');
-  gl.enableVertexAttribArray(loc);
-  gl.vertexAttribPointer(loc, 3, gl.FLOAT, false, 0, 0);
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-  const uRot = gl.getUniformLocation(prog, 'uRot'), uTilt = gl.getUniformLocation(prog, 'uTilt'), uAspect = gl.getUniformLocation(prog, 'uAspect');
-  loop(canvas, (t) => {
-    resize(canvas, gl);
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform1f(uRot, t * .15 + getSpin());
-    gl.uniform1f(uTilt, .35);
-    gl.uniform1f(uAspect, canvas.width / canvas.height);
-    gl.drawArrays(gl.LINES, 0, v.length / 3);
-  });
+  gl.enable(gl.DEPTH_TEST);gl.clearColor(0,0,0,0);
+  const res=gl.getUniformLocation(prog,'uResolution'),time=gl.getUniformLocation(prog,'uTime'),pointer=gl.getUniformLocation(prog,'uPointer'),scroll=gl.getUniformLocation(prog,'uScroll');
+  let raf=0,visible=false,disposed=false,last=0,lost=false;
+  const target={x:0,y:0},current={x:0,y:0};
+  const compact=matchMedia('(max-width: 700px)').matches;
+  const render=(now:number)=>{
+    raf=0;if(disposed||lost||!visible||document.hidden)return;
+    if(!reduced && now-last<(compact?33:16)){raf=requestAnimationFrame(render);return;}last=now;
+    const dpr=Math.min(devicePixelRatio,compact?1.25:1.6);
+    const w=Math.max(1,Math.round(canvas.clientWidth*dpr)),h=Math.max(1,Math.round(canvas.clientHeight*dpr));
+    if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl!.viewport(0,0,w,h);}
+    current.x+=(target.x-current.x)*.045;current.y+=(target.y-current.y)*.045;
+    gl!.uniform2f(res,w,h);gl!.uniform1f(time,reduced?4:now/1000);
+    gl!.uniform2f(pointer,current.x,current.y);gl!.uniform1f(scroll,reduced?0:Math.min(1,Math.max(0,-canvas.getBoundingClientRect().top/innerHeight)));
+    gl!.clear(gl!.COLOR_BUFFER_BIT|gl!.DEPTH_BUFFER_BIT);gl!.drawArrays(gl!.TRIANGLES,0,mesh.positions.length/3);
+    canvas.parentElement?.classList.add('gl-ready');
+    if(!reduced)raf=requestAnimationFrame(render);
+  };
+  const schedule=()=>{if(!raf&&!disposed&&visible&&!document.hidden&&!lost)raf=requestAnimationFrame(render);};
+  const observer=new IntersectionObserver(([e])=>{visible=e.isIntersecting;if(visible)schedule();else{cancelAnimationFrame(raf);raf=0;}});
+  observer.observe(canvas);
+  const resize=new ResizeObserver(schedule);resize.observe(canvas);
+  const move=(e:PointerEvent)=>{if(reduced)return;target.x=(e.clientX/innerWidth-.5)*2;target.y=(e.clientY/innerHeight-.5)*2;};
+  const visibility=()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0;}else schedule();};
+  const contextLost=(e:Event)=>{e.preventDefault();lost=true;cancelAnimationFrame(raf);raf=0;canvas.parentElement?.classList.remove('gl-ready');};
+  window.addEventListener('pointermove',move,{passive:true});document.addEventListener('visibilitychange',visibility);canvas.addEventListener('webglcontextlost',contextLost);
+  return ()=>{disposed=true;cancelAnimationFrame(raf);observer.disconnect();resize.disconnect();window.removeEventListener('pointermove',move);document.removeEventListener('visibilitychange',visibility);canvas.removeEventListener('webglcontextlost',contextLost);release();};
 }

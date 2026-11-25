@@ -1,27 +1,38 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Cloud from '../components/Cloud.astro';
-import { reels, reelThumb, reelUrl, fmtDate, instagram, instagramUser, artist } from '../data';
+import Icon from '../components/Icon.astro';
+import { reels, reelThumb, reelUrl, fmtDate, instagram, instagramUser } from '../data';
+
+const [latest, ...archive] = reels;
 ---
-<Layout title="Clips" description={`Reels y clips cortos de ${artist} en Instagram (@${instagramUser}).`}>
-  <section class="pad page-head scene" style="min-height:auto">
-    <Cloud style="top:18%;right:8%" speed={0.9} />
-    <h1 class="h1 split">Clips</h1>
-    <p class="reveal">Adelantos, freestyles y el día a día. Los reels de @{instagramUser}, aquí mismo.</p>
-  </section>
-  <section class="pad">
-    <div class="reels">
-      {reels.map((r, i) => (
-        <button type="button" class="reel pop" data-play={`instagram:${r.id}`} data-title={`Reel · ${fmtDate(r.date)}`} aria-label={`Ver reel del ${fmtDate(r.date)}`}>
-          <img src={reelThumb(r)} alt="" width="360" height="640" loading={i < 4 ? 'eager' : 'lazy'} />
-          <span class="disc-play" aria-hidden="true">▶</span>
-          <span class="reel-date cap">{fmtDate(r.date)}</span>
-        </button>
-      ))}
+<Layout title="Clips" description="Adelantos, freestyles y clips de MARKHO.">
+  <header class="clip-feature pad">
+    <div>
+      <p class="eyebrow">Último reel</p>
+      <h1 class="split">Clips<span>.</span></h1>
+      <p>Adelantos, freestyles y momentos de estudio.</p>
+      <a class="text-link" href={instagram} target="_blank" rel="noopener"><Icon name="Instagram" /> @{instagramUser}</a>
     </div>
-    <p class="actions" style="padding:20px 0 10vh">
-      <a class="btn" href={instagram} target="_blank" rel="noopener">Seguir en Instagram ↗</a>
-      <a class="btn ghost" href={reelUrl(reels[0])} target="_blank" rel="noopener">Último reel ↗</a>
-    </p>
+    <div class="feature-reel">
+      <button type="button" data-play={`instagram:${latest.id}`} data-title={`Reel · ${fmtDate(latest.date)}`} aria-label="Reproducir el último reel">
+        <img src={reelThumb(latest)} alt="" width="360" height="640" />
+        <span aria-hidden="true"><Icon name="play" /></span>
+      </button>
+      <a href={reelUrl(latest)} target="_blank" rel="noopener">{fmtDate(latest.date)} <span>Instagram ↗</span></a>
+    </div>
+  </header>
+  <section class="clip-archive pad" aria-labelledby="clip-archive-title">
+    <div class="collection-head"><h2 id="clip-archive-title">Más clips</h2></div>
+    <ul class="clip-grid">
+      {archive.map(reel => (
+        <li>
+          <button type="button" data-play={`instagram:${reel.id}`} data-title={`Reel · ${fmtDate(reel.date)}`} aria-label={`Reproducir reel del ${fmtDate(reel.date)}`}>
+            <img src={reelThumb(reel)} alt="" width="360" height="640" loading="lazy" />
+            <span aria-hidden="true"><Icon name="play" /></span>
+          </button>
+          <a href={reelUrl(reel)} target="_blank" rel="noopener">{fmtDate(reel.date)} <span aria-label="Abrir en Instagram">↗</span></a>
+        </li>
+      ))}
+    </ul>
   </section>
 </Layout>

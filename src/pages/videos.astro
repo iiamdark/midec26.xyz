@@ -1,16 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Cloud from '../components/Cloud.astro';
 import Collabs from '../components/Collabs.astro';
 import { videos, thumb, youtube } from '../data';
 ---
 <Layout title="Vídeos" description="Videoclips y visualizers de Markho.">
-  <section class="pad page-head scene" style="min-height:auto">
-    <Cloud style="top:18%;right:10%" speed={1.1} />
-    <h1 class="h1 split">Vídeos</h1>
-    <p class="reveal">Videoclips y visualizers del canal de YouTube.</p>
-  </section>
-  <section class="pad videos">
+  <header class="pad archive-head">
+    <p class="eyebrow">Videoclips y visualizers</p>
+    <h1 class="split">Vídeos<span>.</span></h1>
+    <nav class="archive-links" aria-label="Enlaces de vídeo"><a href={youtube} target="_blank" rel="noopener">Canal de YouTube ↗</a></nav>
+  </header>
+  <section class="pad videos video-archive" aria-label="Archivo de vídeos">
     {videos.map((v, i) => (
       <article class="video reveal">
         <button type="button" class="video-media" data-play={`youtube:${v.id}`} data-title={v.t} aria-label={`Reproducir ${v.t}`}>

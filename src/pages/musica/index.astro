@@ -1,40 +1,50 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import Cloud from '../../components/Cloud.astro';
-import SongDisc from '../../components/SongDisc.astro';
+import Icon from '../../components/Icon.astro';
 import Collabs from '../../components/Collabs.astro';
-import Embed from '../../components/Embed.astro';
 import AdSlot from '../../components/AdSlot.astro';
-import { songs, spotify, spotifyId, fmtDate } from '../../data';
+import { songs, cover, spotify } from '../../data';
+
+const groups = [
+  { id: 'manana', label: 'Mañana', tracks: songs.filter(song => song.project === 'Mañana') },
+  { id: 'singles', label: 'Singles', tracks: songs.filter(song => !song.project) },
+  { id: 'covers', label: 'Covers', tracks: songs.filter(song => song.project === 'Cover') },
+];
 ---
-<Layout title="Música" description="Todas las canciones de Markho en Spotify y YouTube.">
-  <section class="pad page-head scene" style="min-height:auto">
-    <Cloud style="top:22%;right:6%" speed={0.8} />
-    <h1 class="h1 split">Música</h1>
-    <p class="reveal">{songs.length} canciones en Spotify y YouTube. Toca un disco para escucharlo aquí mismo.</p>
-  </section>
-  <section class="pad">
-    <div class="discs">
-      {songs.map((s, i) => <SongDisc song={s} index={i} />)}
-    </div>
-    <ol class="tracklist reveal">
-      {songs.map((s, i) => (
-        <li>
-          <a href={`/musica/${s.slug}`}>
-            <span class="cap">{String(i + 1).padStart(2, '0')}</span>
-            <span class="t">{s.t}{s.explicit && <span class="e" title="Explícito">E</span>}</span>
-            <span class="cap">{fmtDate(s.date)}</span>
-            <span class="cap">{s.dur}</span>
-          </a>
-        </li>
-      ))}
-    </ol>
-  </section>
+<Layout title="Música" description="Discografía de MARKHO. Escucha Mañana y sus singles.">
+  <header class="archive-head pad">
+    <p class="eyebrow">Discografía</p>
+    <h1 class="split">Música<span>.</span></h1>
+    <nav class="archive-links" aria-label="Ir a la colección">
+      {groups.map(group => <a href={`#${group.id}`}>{group.label} ↓</a>)}
+      <a href={spotify} target="_blank" rel="noopener"><Icon name="Spotify" /> Spotify</a>
+    </nav>
+  </header>
+
+  {groups.map(group => (
+    <section class="collection pad" id={group.id} aria-labelledby={`${group.id}-title`}>
+      <div class="collection-head">
+        <h2 id={`${group.id}-title`}>{group.label}</h2>
+        <span class="cap">{group.tracks.length} temas</span>
+      </div>
+      <ul class="track-shelf">
+        {group.tracks.map(song => (
+          <li class="track-tile">
+            <div class="track-sleeve">
+              <a href={`/musica/${song.slug}`} tabindex="-1" aria-hidden="true">
+                <img src={cover(song)} alt="" width="640" height="640" loading="lazy" />
+              </a>
+              <a class="song-open" href={`/musica/${song.slug}`} aria-label={`Abrir ${song.t}`}><Icon name="play" /></a>
+            </div>
+            <div class="track-caption">
+              <h3><a href={`/musica/${song.slug}`}>{song.t}</a></h3>
+              <span>{song.dur} {song.explicit && <abbr title="Explícito">E</abbr>}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
   <AdSlot slot="music" />
   <Collabs />
-  <section class="pad embed-block">
-    <h2 class="h2 split">Escúchalo todo</h2>
-    <Embed src={`https://open.spotify.com/embed/artist/${spotifyId}?theme=0`} title="Markho en Spotify" provider="Spotify" height={452} />
-    <p style="padding:45px 0 10vh"><a class="btn" href={spotify} target="_blank" rel="noopener">Abrir en Spotify ↗</a></p>
-  </section>
 </Layout>

@@ -1,7 +1,6 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import { sculpture } from './gl';
 
 gsap.registerPlugin(ScrollTrigger);
 const motion=matchMedia('(prefers-reduced-motion: reduce)');
@@ -11,54 +10,12 @@ lenis.on('scroll',ScrollTrigger.update);
 gsap.ticker.add(t=>lenis.raf(t*1000));
 gsap.ticker.lagSmoothing(0);
 let pageCleanup=()=>{};
-const entry=document.querySelector<HTMLDialogElement>('#entry-intro')!;
 const menu=document.querySelector<HTMLDialogElement>('#mobile-menu')!;
 const menuToggle=document.querySelector<HTMLButtonElement>('.menu-toggle')!;
-let entryComplete=!document.documentElement.classList.contains('entry-pending');
-let entryTimeline:gsap.core.Timeline|undefined;
 let menuClosing=false;
 function syncScrollLock(){
-  if(entry.open||menu.open||document.querySelector<HTMLDialogElement>('dialog.player')?.open)lenis.stop();else lenis.start();
+  if(menu.open||document.querySelector<HTMLDialogElement>('dialog.player')?.open)lenis.stop();else lenis.start();
 }
-function finishEntry(){
-  if(entryComplete)return;
-  entryComplete=true;entryTimeline?.kill();
-  try{sessionStorage.setItem('mk-entry-v1','1');}catch{}
-  if(entry.open)entry.close();
-  document.documentElement.classList.remove('entry-pending');
-  gsap.set([entry,...entry.querySelectorAll('.entry-mask-tint,.entry-word,.entry-top,.entry-bottom,.entry-coordinate')],{clearProps:'all'});
-  gsap.set('.hero',{clearProps:'transform,filter'});
-  syncScrollLock();
-  document.dispatchEvent(new Event('mk:entry-complete'));
-  requestAnimationFrame(()=>{lenis.resize();ScrollTrigger.refresh();});
-}
-function runEntry(){
-  if(entryComplete)return;
-  if(motion.matches){finishEntry();return;}
-  try{entry.showModal();}catch{finishEntry();return;}
-  syncScrollLock();
-  const svg=entry.querySelector<SVGSVGElement>('.entry-mask-svg')!;
-  const shape=entry.querySelector<SVGPathElement>('.entry-mask-shape')!;
-  const tint=entry.querySelector<SVGPathElement>('.entry-mask-tint')!;
-  const width=innerWidth,height=innerHeight;
-  svg.setAttribute('viewBox','0 0 '+width+' '+height);
-  const portal={scale:width<700?1.05:1.45};
-  const draw=()=>{const transform='translate('+width*.5+' '+height*.44+') scale('+portal.scale+')';shape.setAttribute('transform',transform);tint.setAttribute('transform',transform);};
-  draw();gsap.set(tint,{opacity:1});
-  entryTimeline=gsap.timeline({onComplete:finishEntry,onUpdate:draw})
-    .from('.entry-top,.entry-bottom',{opacity:0,duration:.25},0)
-    .from('.entry-word',{y:20,opacity:0,duration:.4,ease:'power3.out'},.1)
-    .fromTo(portal,{scale:portal.scale*.7},{scale:portal.scale,duration:.45,ease:'power3.out'},0)
-    .to(portal,{scale:portal.scale*.87,duration:.15,ease:'power2.in'},.48)
-    .call(()=>document.dispatchEvent(new Event('mk:entry-reveal')),[],.62)
-    .to('.entry-word,.entry-top,.entry-bottom,.entry-coordinate',{opacity:0,duration:.23},.62)
-    .to(tint,{opacity:0,duration:.28,ease:'power2.out'},.65)
-    .to(portal,{scale:Math.hypot(width,height)/9,duration:.92,ease:'power3.in'},.65);
-}
-entry.querySelector('.entry-skip')!.addEventListener('click',finishEntry);
-entry.addEventListener('cancel',event=>{event.preventDefault();finishEntry();});
-document.addEventListener('mk:intro-timeout',finishEntry);
-
 function closeMenu(restore=true,immediate=false){
   if(!menu.open)return;
   if(menuClosing&&!immediate)return;
@@ -80,7 +37,8 @@ matchMedia('(min-width:701px)').addEventListener('change',event=>{if(event.match
 function initPage(){
   pageCleanup();
   const reduced=motion.matches;
-  let heroReady=()=>{};
+  const journey=document.querySelector<HTMLElement>('[data-journey]');
+  journey?.classList.toggle('has-motion',!reduced);
   const path=location.pathname.replace(/\/$/,'')||'/';
   $$<HTMLAnchorElement>('nav.top li a, .mobile-menu nav a').forEach(a=>{
     const href=a.getAttribute('href')!;
@@ -93,36 +51,8 @@ function initPage(){
   syncScroll();window.addEventListener('scroll',syncScroll,{passive:true});
   let destroyGL=()=>{};
   const canvas=document.querySelector<HTMLCanvasElement>('[data-sculpture]');
-  if(canvas)destroyGL=sculpture(canvas,reduced);
-  const galleryWindow=document.querySelector<HTMLElement>('.release-window');
-  const galleryRail=document.querySelector<HTMLElement>('.release-rail');
-  const galleryProgress=document.querySelector<HTMLElement>('.gallery-progress');
-  const galleryFill=galleryProgress?.querySelector<HTMLElement>('span');
-  const galleryCurrent=document.querySelector<HTMLElement>('[data-gallery-current]');
-  const galleryButtons=$$<HTMLButtonElement>('[data-release-index]');
-  let pinnedGallery:ScrollTrigger|undefined;
-  let galleryIndex=-1;
-  const updateGallery=(progress:number)=>{
-    const clamped=Math.max(0,Math.min(1,progress));
-    if(galleryFill)galleryFill.style.transform='scaleX('+(.25+clamped*.75)+')';
-    const index=Math.min(3,Math.round(clamped*3));
-    if(index===galleryIndex)return;
-    galleryIndex=index;
-    if(galleryCurrent)galleryCurrent.textContent=String(index+1).padStart(2,'0');
-    galleryProgress?.setAttribute('aria-valuenow',String(index+1));
-    galleryButtons.forEach((button,i)=>{if(i===index)button.setAttribute('aria-current','true');else button.removeAttribute('aria-current');});
-  };
-  const galleryScroll=()=>{if(!pinnedGallery&&galleryWindow)updateGallery(galleryWindow.scrollLeft/Math.max(1,galleryWindow.scrollWidth-galleryWindow.clientWidth));};
-  const galleryGo=(event:Event)=>{
-    const button=event.currentTarget as HTMLButtonElement;
-    const fraction=Number(button.dataset.releaseIndex)/3;
-    if(pinnedGallery){lenis.scrollTo(pinnedGallery.start+(pinnedGallery.end-pinnedGallery.start)*fraction,{duration:reduced?0:.7,immediate:reduced});}
-    else if(galleryWindow)galleryWindow.scrollTo({left:(galleryWindow.scrollWidth-galleryWindow.clientWidth)*fraction,behavior:reduced?'instant':'smooth'});
-  };
-  galleryButtons.forEach(button=>button.addEventListener('click',galleryGo));
-  galleryWindow?.addEventListener('scroll',galleryScroll,{passive:true});
-  updateGallery(0);
-  const mm=gsap.matchMedia();
+  let active=true;
+  if(canvas)void import('./gl').then(({sculpture})=>{if(active)destroyGL=sculpture(canvas,reduced);}).catch(()=>{});
   const ctx=gsap.context(()=>{
     if(!reduced){
       $$('.split').forEach(el=>{
@@ -140,52 +70,39 @@ function initPage(){
           });node.replaceWith(fragment);
         });
       });
-      if(document.querySelector('.hero')){
-        // Entrance owns these text transforms; scroll never rewrites or hides them.
-        const enter=gsap.timeline({paused:!entryComplete})
-          .fromTo('.hero-word',{y:20,opacity:0},{y:0,opacity:1,duration:.75,ease:'power3.out',clearProps:'transform,opacity'},0)
-          .fromTo('.hero-enter',{y:12,opacity:0},{y:0,opacity:1,duration:.6,stagger:.05,ease:'power3.out',clearProps:'transform,opacity'},.08);
-        heroReady=()=>{enter.play();};
-        document.addEventListener('mk:entry-complete',heroReady,{once:true});
-        document.addEventListener('mk:entry-reveal',heroReady,{once:true});
-        gsap.to('.hero-art',{yPercent:10,rotation:3,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+      if(journey){
+        const mask=journey.querySelector('.journey-mask');
+        const timeline=gsap.timeline({defaults:{ease:'none'},scrollTrigger:{
+          trigger:journey,start:'top top',end:'bottom bottom',scrub:true,
+        }});
+        timeline.fromTo('.planet-world',{scale:1},{scale:2.5,duration:1},0)
+          .fromTo('.planet-sky',{yPercent:0},{yPercent:-20,duration:1},0)
+          .fromTo(mask,{clipPath:'circle(0% at 60% 55%)'},{clipPath:'circle(115% at 60% 55%)',duration:.64},.36)
+          .fromTo('.journey-mask span',{scale:.85,opacity:0},{scale:1,opacity:1,duration:.27},.73);
       }
       $$('.split').forEach(el=>gsap.from(el.querySelectorAll('.w>span'),{yPercent:110,duration:1,ease:'power4.out',stagger:.05,scrollTrigger:{trigger:el,start:'top 92%',once:true}}));
       $$('.reveal').forEach(el=>gsap.from(el,{y:30,opacity:0,duration:.9,ease:'power3.out',clearProps:'transform,opacity',scrollTrigger:{trigger:el,start:'top 94%',once:true}}));
       ScrollTrigger.batch('.pop',{start:'top 95%',once:true,onEnter:els=>gsap.fromTo(els,{y:40,opacity:0},{y:0,opacity:1,duration:.9,stagger:.07,ease:'power3.out',clearProps:'transform,opacity'})});
       $$<HTMLImageElement>('[data-parallax]').forEach(img=>gsap.fromTo(img,{yPercent:-8},{yPercent:0,ease:'none',scrollTrigger:{trigger:img.parentElement,start:'top bottom',end:'bottom top',scrub:true}}));
       $$('.lyric').forEach(el=>ScrollTrigger.create({trigger:el,start:'top 78%',end:'bottom 20%',toggleClass:'on'}));
+      ScrollTrigger.batch('.lyrics .stanza',{
+        start:'top 90%',once:true,
+        onEnter:stanzas=>stanzas.forEach(stanza=>stanza.classList.add('stanza-entered')),
+      });
+      $$('.lyric-orbit').forEach(orbit=>gsap.to(orbit,{rotation:135,transformOrigin:'50% 50%',ease:'none',
+        scrollTrigger:{trigger:orbit.closest('.lyrics-block'),start:'top 85%',end:'bottom bottom',scrub:true},
+      }));
       $$('[data-count]').forEach(el=>{
         const count={v:0};gsap.to(count,{v:Number(el.dataset.count)||0,duration:1.4,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 95%',once:true},onUpdate:()=>{el.textContent=String(Math.round(count.v));}});
       });
     }else{$$('[data-count]').forEach(el=>{el.textContent=el.dataset.count||'0';});}
-    mm.add('(min-width: 1000px) and (min-height: 720px) and (prefers-reduced-motion: no-preference)',()=>{
-      const section=document.querySelector<HTMLElement>('.release-section');
-      const rail=document.querySelector<HTMLElement>('.release-rail');
-      const windowEl=document.querySelector<HTMLElement>('.release-window');
-      if(!section||!rail||!windowEl)return;
-      section.classList.add('is-pinned');
-      const distance=()=>Math.max(0,rail.scrollWidth-windowEl.clientWidth);
-      const tween=gsap.to(rail,{x:()=>-distance(),ease:'none',scrollTrigger:{trigger:section,start:'top top',end:()=>'+='+distance(),pin:true,scrub:.8,invalidateOnRefresh:true,anticipatePin:1,onUpdate:self=>updateGallery(self.progress)}});
-      pinnedGallery=tween.scrollTrigger;galleryScroll();
-      const keyboard=(event:KeyboardEvent)=>{
-        if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key))return;
-        if(event.target!==windowEl)return;
-        const st=tween.scrollTrigger!;
-        const current=st.scroll();
-        const next=event.key==='Home'?st.start:event.key==='End'?st.end:current+(event.key==='ArrowRight'?1:-1)*distance()/3;
-        event.preventDefault();lenis.scrollTo(Math.max(st.start,Math.min(st.end,next)),{duration:.65});
-      };
-      windowEl.addEventListener('keydown',keyboard);
-      return ()=>{pinnedGallery=undefined;windowEl.removeEventListener('keydown',keyboard);section.classList.remove('is-pinned');galleryScroll();};
-    });
   });
   const refresh=()=>{if(document.contains(nav)){lenis.resize();ScrollTrigger.refresh();syncScroll();}};
   const images=$$<HTMLImageElement>('img').filter(img=>!img.complete);
   images.forEach(img=>img.addEventListener('load',refresh,{once:true}));
-  let active=true;document.fonts.ready.then(()=>{if(active)refresh();});
+  document.fonts.ready.then(()=>{if(active)refresh();});
   refresh();
-  pageCleanup=()=>{active=false;document.removeEventListener('mk:entry-complete',heroReady);document.removeEventListener('mk:entry-reveal',heroReady);galleryButtons.forEach(button=>button.removeEventListener('click',galleryGo));galleryWindow?.removeEventListener('scroll',galleryScroll);images.forEach(img=>img.removeEventListener('load',refresh));window.removeEventListener('scroll',syncScroll);mm.revert();ctx.revert();destroyGL();};
+  pageCleanup=()=>{active=false;images.forEach(img=>img.removeEventListener('load',refresh));window.removeEventListener('scroll',syncScroll);ctx.revert();destroyGL();};
 }
 
 const player=document.querySelector<HTMLDialogElement>('dialog.player')!;
@@ -243,7 +160,6 @@ const w=window as AdsWindow;
 function toast(message:string){const el=document.createElement('div');el.className='toast';el.role='status';el.textContent=message;document.body.append(el);setTimeout(()=>el.remove(),6000);}
 document.addEventListener('click',event=>{
   const target=event.target as Element;
-  if(target.closest('[data-replay-entry]')){entryComplete=false;document.documentElement.classList.add('entry-pending');lenis.scrollTo(0,{immediate:true,force:true});runEntry();initPage();}
   const btn=target.closest<HTMLElement>('[data-play]');if(btn)play(btn);
   if(!target.closest('.facade a')){
     const facade=target.closest<HTMLElement>('.facade');
@@ -262,13 +178,13 @@ const themeBtn=document.querySelector<HTMLButtonElement>('.theme-toggle')!;
 const syncTheme=()=>{
   const light=document.documentElement.dataset.theme==='light';
   themeBtn.ariaLabel=light?'Activar tema oscuro':'Activar tema claro';themeBtn.title=themeBtn.ariaLabel;themeBtn.setAttribute('aria-pressed',String(light));
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',light?'#eaeae1':'#11120f');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',light?'#f6e9eb':'#100d10');
 };
 themeBtn.addEventListener('click',()=>{
   if(document.documentElement.dataset.theme==='light')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme='light';
   try{localStorage.setItem('mk-theme-v2',document.documentElement.dataset.theme||'dark');}catch{}
   syncTheme();
 });
-motion.addEventListener('change',()=>{if(motion.matches)finishEntry();lenis.options.smoothWheel=!motion.matches;initPage();});
-runEntry();syncTheme();initPage();
+motion.addEventListener('change',()=>{lenis.options.smoothWheel=!motion.matches;initPage();});
+syncTheme();initPage();
 document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(()=>{try{(w.adsbygoogle=w.adsbygoogle||[]).push({});}catch{}});

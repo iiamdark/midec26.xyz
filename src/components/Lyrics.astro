@@ -21,11 +21,18 @@ const stanzas = blocks.map((lines) => ({
   chorus: (count.get(opening(lines)) ?? 0) > 1,
   spoken: lines.every((l) => l.kind === 'spoken'),
 }));
+const symbols: Record<string, string> = {
+  animal: 'M32 94 62 50 49 110 83 65 70 122 105 78',
+  'tomorrow-on-top': 'M80 126V42m-30 30 30-30 30 30',
+  'level-up': 'M39 118h27V93h27V68h26V43m-22 0h22v22',
+  scorsese: 'M37 60h86v56H37zm0 0-8-19 79-23 8 19zm21-27 8 19m19-27 8 19',
+  'si-estuvieras-aqui': 'M42 91c16-54 64-54 76 0M44 108c23-13 49-13 72 0M80 48v67',
+};
 ---
-<section class="pad lyrics-block">
+<section id="letra" class="pad lyrics-block">
   <h2 class="h2 split" style="margin-bottom:45px">Letra</h2>
   {stanzas.length ? (
-    <div class={`lyrics-wrap ${song.decor ? 'has-decor' : ''}`}>
+    <div class="lyrics-wrap has-decor">
       <div class="lyrics">
         {stanzas.map((st) => (
           <p class={`stanza ${st.chorus ? 'chorus' : ''} ${st.spoken ? 'spoken' : ''}`}>
@@ -35,6 +42,20 @@ const stanzas = blocks.map((lines) => ({
           </p>
         ))}
       </div>
+
+      {!song.decor && (
+        <aside class="lyric-art" aria-hidden="true">
+          <svg viewBox="0 0 160 160" fill="none">
+            <g class="lyric-orbit" stroke="currentColor">
+              <circle cx="80" cy="80" r="74" stroke-opacity=".3" stroke-dasharray="3 7" />
+              <circle cx="80" cy="80" r="62" stroke-opacity=".55" />
+              <circle cx="80" cy="80" r="52" stroke-opacity=".2" />
+              <circle cx="80" cy="6" r="4" fill="currentColor" />
+            </g>
+            <path class="lyric-symbol" d={symbols[song.slug] || 'M39 80h12l10-24 14 46 12-35 14 13h19'} stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </aside>
+      )}
 
       {song.decor === 'heart' && (
         <div class="decor" aria-hidden="true">
@@ -123,3 +144,4 @@ const stanzas = blocks.map((lines) => ({
     <p class="lyrics-soon reveal">La letra de «{song.t}» llegará pronto. ¿La quieres ya? Escríbele a <a href={`mailto:${email}`}>{email}</a>.</p>
   )}
 </section>
+

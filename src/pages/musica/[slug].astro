@@ -1,9 +1,10 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
 import Lyrics from '../../components/Lyrics.astro';
 import Embed from '../../components/Embed.astro';
 import AdSlot from '../../components/AdSlot.astro';
-import { songs, cover, fmtDate, thumb, artist, label, platforms, playSource, type Song } from '../../data';
+import { songs, cover, fmtDate, thumb, artist, label, platforms, type Song } from '../../data';
 
 export function getStaticPaths() {
   return songs.map((song, i) => ({ params: { slug: song.slug }, props: { song, i } }));
@@ -11,6 +12,7 @@ export function getStaticPaths() {
 interface Props { song: Song; i: number }
 const { song, i } = Astro.props;
 const prev = songs[i - 1], next = songs[i + 1];
+const intro = ['slash', 'orbit', 'stairs', 'shutter', 'heart', 'sweep', 'split', 'iris', 'rise', 'corner'][i];
 const year = song.date.slice(0, 4);
 const c = song.credits ?? {};
 const credits = [
@@ -20,51 +22,58 @@ const credits = [
   ['Mezcla', c.mix],
   ['Máster', c.master],
   ['Portada', c.cover],
-  ['Sello', `${label} · ℗ ${year}`],
+  ['Sello', song.coverNotes ? undefined : `${label} · ℗ ${year}`],
   ['Lanzamiento', fmtDate(song.date)],
 ].filter(([, v]) => v) as [string, string][];
 ---
 <Layout title={song.t} description={`«${song.t}» de ${artist}. Lanzamiento publicado el ${fmtDate(song.date)}.`} image={cover(song)}>
-  <section class="pad song-hero">
-    <div class="song-artwork pop"><div class="song-artwork-top cap"><span>MK / ARCHIVO {String(i + 1).padStart(2, '0')}</span><span>{year}</span></div><img class={`song-cover ${song.color}`} src={cover(song)} alt={`Portada de ${song.t}`} width="640" height="640" /><span class="song-artwork-stamp" aria-hidden="true">↗</span><span class="song-artwork-bottom cap">{song.project || 'Single'} / MARKHO</span></div>
-    <div>
-      <a href="/musica" class="cap back">← Música</a>
-      <h1 class="h1 split">{song.t}</h1>
-      <p class="song-project eyebrow reveal">{song.project || 'Single'}{song.explicit && ' / Explícito'}</p>
-      <dl class="song-meta reveal"><div><dt>Lanzamiento</dt><dd>{fmtDate(song.date)}</dd></div><div><dt>Duración</dt><dd>{song.dur}</dd></div><div><dt>Artista</dt><dd>Markho</dd></div></dl>
-      <div class="actions reveal">
-        <button type="button" class="btn" data-play={playSource(song)} data-title={song.t}>Escuchar ahora</button>
+  <section class="pad song-hero song-entry" data-song-intro={intro} aria-labelledby="song-title">
+    <div class="song-artwork">
+      <img class="song-cover" src={cover(song)} alt={`Portada de ${song.t}`} width="640" height="640" />
+    </div>
+    <div class="song-overview">
+      <a href="/musica" class="cap back">← Discografía</a>
+      <p class="song-project eyebrow">{song.project || 'Single'}{song.explicit && ' · Explícito'}</p>
+      <h1 class="h1" id="song-title">{song.t}</h1>
+      <p class="song-byline">{artist} <span>·</span> <time datetime={song.date}>{fmtDate(song.date)}</time> <span>·</span> {song.dur}</p>
+      <div id="escuchar" class="song-primary-player" aria-label="Reproductor">
+        {song.spotify ? (
+          <Embed src={`https://open.spotify.com/embed/track/${song.spotify}?theme=0`} title={`${song.t} en Spotify`} provider="Spotify" height={152} class="small" />
+        ) : song.youtube && (
+          <Embed src={`https://www.youtube-nocookie.com/embed/${song.youtube}?autoplay=1`} title={`Visualizer de ${song.t}`} provider="YouTube" height={480} class="small video-embed" />
+        )}
       </div>
-      <ul class="platforms reveal" aria-label="Escuchar en">
-        {platforms(song).map((p) => <li><a href={p.href} target="_blank" rel="noopener">{p.label} ↗</a></li>)}
+      <ul class="platforms" aria-label="Plataformas y letra">
+        {platforms(song).map((p) => <li><a href={p.href} target="_blank" rel="noopener"><Icon name={p.label} /> {p.label} <Icon name="external" /></a></li>)}
+        {(song.lyrics || song.lyricsInVideoDescription) && <li><a href="#letra">Ver letra ↓</a></li>}
       </ul>
     </div>
   </section>
 
-  {song.spotify && <section class="pad embed-block">
-    <Embed src={`https://open.spotify.com/embed/track/${song.spotify}?theme=0`} title={`${song.t} en Spotify`} provider="Spotify" height={352} class="small" />
-  </section>}
-
-  {song.youtube && (
-    <section class="pad" style="padding-bottom:10vh">
-      <h2 class="h2 split" style="margin-bottom:45px">Visual</h2>
-      <button type="button" class="video-media reveal" data-play={`youtube:${song.youtube}`} data-title={song.t} aria-label={`Ver el vídeo de ${song.t}`}>
-        <img src={thumb(song.youtube)} alt="" width="1280" height="720" loading="lazy" />
-        <span class="disc-play" aria-hidden="true">▶</span>
-      </button>
+  {song.spotify && song.youtube && (
+    <section class="pad song-listening" aria-labelledby="visualizer-title">
+      <header><p class="eyebrow">YouTube</p><h2 id="visualizer-title" class="h2">Videoclip</h2></header>
+      <Embed src={`https://www.youtube-nocookie.com/embed/${song.youtube}?autoplay=1`} title={`Vídeo de ${song.t}`} provider="YouTube" height={480} class="small video-embed" image={thumb(song.youtube)} />
     </section>
   )}
 
-  <Lyrics song={song} />
+  {song.lyrics ? <Lyrics song={song} /> : song.lyricsInVideoDescription && song.youtube && (
+    <section id="letra" class="pad lyrics-block" aria-labelledby="lyrics-title">
+      <h2 class="h2" id="lyrics-title">Letra</h2>
+      <p>La letra está en la descripción del visualizer. Pulsa «Más» para desplegarla.</p>
+      <a class="text-link" href={`https://www.youtube.com/watch?v=${song.youtube}`} target="_blank" rel="noopener"><Icon name="YouTube" /> Abrir la letra en YouTube <Icon name="external" /></a>
+    </section>
+  )}
 
   <section class="pad credits-block">
     <div class="credits-heading"><p class="eyebrow"><span class="section-index">MK /</span> Ficha técnica</p><h2 class="h2 split">Los créditos<span class="accent">.</span></h2></div>
+    {song.coverNotes && <p class="body-copy">{song.coverNotes}</p>}
     <dl class="credits">
       {credits.map(([k, v]) => <div class="reveal"><dt class="cap">{k}</dt><dd>{v}</dd></div>)}
     </dl>
   </section>
 
-  <AdSlot slot="song" />
+  {!song.coverNotes && <AdSlot slot="song" />}
 
   <nav class="pad prevnext song-neighbours" aria-label="Otras canciones">
     {prev ? <a href={`/musica/${prev.slug}`} class="next-song pop"><img src={cover(prev)} alt="" width="300" height="300" loading="lazy" /><span class="next-song-copy"><span class="cap">← Más reciente</span><span class="h3">{prev.t}</span><span class="cap">{prev.project || 'Single'} / {prev.dur}</span></span><span class="next-song-arrow" aria-hidden="true">↖</span></a> : <a href="/musica" class="next-song next-song-archive pop"><span class="next-song-copy"><span class="cap">← El archivo completo</span><span class="h3">Toda la música</span><span class="cap">{songs.length} canciones / MARKHO</span></span><span class="next-song-arrow" aria-hidden="true">↗</span></a>}

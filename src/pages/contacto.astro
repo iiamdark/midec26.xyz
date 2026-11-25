@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
 import Cloud from '../components/Cloud.astro';
 import { email, socials } from '../data';
 ---
@@ -12,7 +13,7 @@ import { email, socials } from '../data';
   <section class="pad" style="padding-bottom:10vh">
     <a class="big-link reveal" href={`mailto:${email}`}>{email}</a>
     <div class="next">
-      {socials.map((s) => <a class="pop" href={s.href} target="_blank" rel="noopener">{s.label} ↗</a>)}
+      {socials.map((s) => <a class="pop" href={s.href} target="_blank" rel="noopener"><Icon name={s.label} /> {s.label}</a>)}
     </div>
   </section>
 </Layout>

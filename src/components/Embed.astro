@@ -1,13 +1,12 @@
 ---
-// Third-party player behind a click: nothing loads (and no third-party
-// cookies are set) until the visitor asks for it.
-interface Props { src: string; title: string; provider: string; height: number; class?: string }
-const { src, title, provider, height, class: cls = '' } = Astro.props;
+import Icon from './Icon.astro';
+interface Props { src: string; title: string; provider: string; height: number; class?: string; image?: string }
+const { src, title, provider, height, class: cls = '', image } = Astro.props;
 ---
-<div class={`embed facade reveal ${cls}`} style={`--h:${height}px`} data-embed-src={src} data-embed-title={title}>
+<div class={`embed facade ${cls}`} style={`--h:${height}px`} data-embed-src={src} data-embed-title={title}>
   <button type="button" class="facade-btn">
-    <span class="disc-play" aria-hidden="true">▶</span>
-    <span class="sub">Cargar reproductor de {provider}</span>
-    <span class="facade-note">Al cargarlo, {provider} puede usar cookies. <a href="/legal/cookies">Más info</a></span>
+    {image && <img class="facade-cover" src={image} alt="" width="480" height="360" loading="lazy" />}
+    <span class="facade-action"><Icon name={provider} /> Reproducir en {provider}</span>
   </button>
+  <a class="facade-note" href="/legal/cookies">Cookies del reproductor</a>
 </div>
